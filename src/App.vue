@@ -3,7 +3,7 @@
 
 <template>
   <div>
-    <main role="main" class="container">
+    <main role="main" class="container-xxl">
       <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
         <div class="container-fluid">
           <router-link class="navbar-brand" to="/"><i class="fas fa-store-alt"></i> Smart POS</router-link>
@@ -83,7 +83,9 @@
           </div>
         </div>
       </nav>
-      <router-view/>  
+      <div class="p-4 bg-white rounded shadow-md" style="margin-top: 70px">
+        <router-view/>        
+      </div>
     </main>
   </div>
 </template>
