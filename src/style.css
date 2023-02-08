@@ -27,3 +27,21 @@ body {
 .bg-gray{
   background-color: #f0f0f0;
 }
+
+.bg-dark{
+  background-color: #295786 !important;
+}
+
+.bg-light{
+  background-color: #5b5c5c !important;
+}
+
+.nav-item .nav-link {
+  color: #f8f9fa;
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.2;
+}
