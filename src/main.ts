@@ -16,12 +16,16 @@ library.add(fas);
 import { dom } from "@fortawesome/fontawesome-svg-core"
 dom.watch();
 
+import Multiselect from 'vue-multiselect'
+import 'vue-multiselect/dist/vue-multiselect.css'
+
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
 
 const app = createApp(App)
 app.component('font-awsome-icon', FontAwesomeIcon)
+app.component('Multiselect', Multiselect)
 app.use(router)
 app.use(VueAxios, axios)
 app.mount('#app')

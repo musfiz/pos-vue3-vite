@@ -33,7 +33,7 @@
       <div class="row">
         <div class="col-md-6 offset-md-3 text-center mt-5">
           <h5>Howlader Electric</h5>
-          <h6>Bottola Shariapur.</h6>
+          <h6>Bottola Shariatpur.</h6>
           <p class=""></p>
           <h6>Developed By <a href="">Mustafizur Rahman</a></h6>
         </div>
