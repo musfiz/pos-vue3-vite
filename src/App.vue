@@ -1,9 +1,11 @@
 <script lang="ts">
-import Nav from './views/layouts/Nav.vue'
+import Login from './views/auth/Login.vue'
+import Index from './views/layouts/Index.vue'
 export default {
+  components: {Login, Index},
   data(){
     return {
-      user: {name: 'nameb'}
+      layout: 'Index'
     }
   }
 }
@@ -11,12 +13,7 @@ export default {
 
 <template>
   <div>
-    <main role="main" class="container-xxl">
-      <Nav />
-      <div class="p-4 bg-white rounded shadow-md" style="margin-top: 70px">
-        <router-view/>        
-      </div>
-    </main>
+      <component :is="layout"></component>
   </div>
 </template>
 

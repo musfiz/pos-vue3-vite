@@ -45,3 +45,11 @@ body {
   font-weight: 500;
   line-height: 1.2;
 }
+
+.required{
+  color: red
+}
+
+.btn-radius{
+  border-radius: 2px;
+}

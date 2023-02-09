@@ -9,7 +9,7 @@
           <div class="navbar-collapse offcanvas-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav" style="margin-left: auto !important">
               <li class="nav-item active"> 
-                <router-link class="nav-link" :to="{name: 'dashboard'}"><i class="fas fa-tachometer-alt"></i> Dashboard</router-link>
+                <router-link class="nav-link" :to="{name: 'home'}"><i class="fas fa-tachometer-alt"></i> Dashboard</router-link>
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -27,8 +27,8 @@
                   <i class="fab fa-product-hunt"></i> Product
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
-                  <li><router-link class="dropdown-item" to="/"><i class="fas fa-plus"></i> Category</router-link></li>
-                  <li><router-link class="dropdown-item" to="/"><i class="fas fa-plus"></i> Subcategory</router-link></li>
+                  <li><router-link class="dropdown-item" :to="{name: 'category.view'}"><i class="fas fa-plus-circle"></i> Category</router-link></li>
+                  <li><router-link class="dropdown-item" to="/"><i class="fas fa-plus-circle"></i> Subcategory</router-link></li>
                   <li><router-link class="dropdown-item" to="/"><i class="fas fa-plus-circle"></i> Product Vendor</router-link></li>
                   <li><router-link class="dropdown-item" to="/"><i class="fas fa-stream"></i> Product Variant</router-link></li>
                   <li><hr class="dropdown-divider"></li>

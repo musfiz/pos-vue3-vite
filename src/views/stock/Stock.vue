@@ -27,30 +27,29 @@ export default {
           <div class="card">
             <div class="card-body">
               <table class="table table-sm table-bordered table-striped resposive">
-                        <thead class="text-center">
-                            <tr>
-                                <th colspan="4">Product Details</th>
-                                <th colspan="3">Price</th>
-                                <th colspan="2">Quantity</th>
-                            </tr>                            
-                        </thead>
-                        <thead class="text-center">
-                            <tr>
-                                <th>SN</th>
-                                <th>Code</th>
-                                <th width="40%">Name</th>
-                                <th>Variant</th>
-                                <th>DP</th>
-                                <th>TP</th>
-                                <th>MRP</th>
-                                <th>Current</th>
-                                <th>Opening</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-center">
-                            
-                        </tbody>
-                    </table>
+                  <thead class="text-center">
+                      <tr>
+                          <th colspan="4">Product Details</th>
+                          <th colspan="3">Price</th>
+                          <th colspan="2">Quantity</th>
+                      </tr>                            
+                  </thead>
+                  <thead class="text-center">
+                      <tr>
+                          <th>SN</th>
+                          <th>Code</th>
+                          <th width="40%">Name</th>
+                          <th>Variant</th>
+                          <th>DP</th>
+                          <th>TP</th>
+                          <th>MRP</th>
+                          <th>Current</th>
+                          <th>Opening</th>
+                      </tr>
+                  </thead>
+                  <tbody class="text-center">                      
+                  </tbody>
+              </table>
             </div>
           </div>
         </div>
