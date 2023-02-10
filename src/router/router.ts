@@ -8,6 +8,8 @@ import Product from '../views/product/Product.vue'
 import ProductAdd from '../views/product/ProductAdd.vue'
 import Stock from '../views/stock/Stock.vue'
 import StockAdd from '../views/stock/StockAdd.vue'
+import SalesRegister from '../views/register/SalesRegister.vue'
+import PurchaseRegister from '../views/register/PurchaseRegister.vue'
 
 const routes = [
   { path: "/", name: "home", component: Dashboard },
@@ -20,6 +22,8 @@ const routes = [
   { path: "/product/add", name: "product.add", component: ProductAdd },
   { path: "/stock", name: "stock.view", component: Stock },
   { path: "/stock/add", name: "stock.add", component: StockAdd },
+  { path: "/register/sales", name: "register.sales", component: SalesRegister },
+  { path: "/register/purchase", name: "register.purchase", component: PurchaseRegister },
 ]
 
 export default routes;

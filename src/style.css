@@ -32,7 +32,7 @@ body {
   background-color: #295786 !important;
 }
 
-.bg-light{
+.bg-dark-gray{
   background-color: #5b5c5c !important;
 }
 
@@ -69,7 +69,23 @@ body {
 }
 
 .multiselect__tags {
-  padding: 7px 40px 0 8px !important;
+  padding: 4px 40px 0 8px !important;
   min-height: 36px !important;
   border: none !important;
+  font-size: 16px !important;  
+}
+.multiselect__placeholder {
+  color: #212529 !important;
+}
+
+.multiselect__single {
+  margin-top: 3px;
+}
+
+.pad-6{
+  padding: 6px
+}
+
+.d-none{
+  display: none;
 }

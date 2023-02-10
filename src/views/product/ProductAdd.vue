@@ -32,17 +32,17 @@ export default {
                   <div class="col-4">
                       <label class="form-label">Category<span class="required">(*)</span></label>
                       <select class="form-select">
-                          <option value="">Select Type</option>
+                          <option value="">Select Category</option>
                       </select>
                   </div>  
                   <div class="col-4">
                       <label class="form-label">Subcategory <span class="required">(*)</span></label>
-                      <multiselect v-model="value" :options="options"></multiselect>
+                      <multiselect v-model="value" :options="options" placeholder="Select Subcategory"></multiselect>
                   </div>  
                   <div class="col-4">
                       <label class="form-label">Vendor<span class="required">(*)</span></label>
                       <select class="form-select">
-                          <option value="">Select Type</option>
+                          <option value="">Select Vendor</option>
                       </select>
                   </div>    
                 </div>                        
