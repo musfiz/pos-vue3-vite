@@ -49,8 +49,8 @@
                   <i class="fas fa-users"></i> Client
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
-                  <li><router-link class="dropdown-item" to="/"><i class="fas fa-user-alt"></i> Customer</router-link></li>
-                  <li><router-link class="dropdown-item" to="/"><i class="fas fa-user-check"></i> Supplier</router-link></li>
+                  <li><router-link class="dropdown-item" :to="{name: 'customer.view'}"><i class="fas fa-user-alt"></i> Customer List</router-link></li>
+                  <li><router-link class="dropdown-item" :to="{name: 'supplier.view'}"><i class="fas fa-user-check"></i> Supplier List</router-link></li>
                 </ul>
               </li>
               <li class="nav-item dropdown">

@@ -5,9 +5,13 @@
         <div class="col">
             <div class="card border-secondary">
                 <div class="card-header d-flex justify-content-between align-items-center">
+                  <div>
                     <h5><i class="fa fa-list"></i> Product</h5>
-                    <router-link :to="{name: 'product.add'}" class="btn btn-success btn-sm"><i class="fa fa-plus-circle"></i> Add Product</router-link>
-                    <!-- <router-link :to="{name: 'product.csv.add'}" class="btn btn-info btn-sm"><i class="fa fa-plus-circle"></i> Add Product By CSV</router-link> -->
+                  </div>
+                  <div>
+                    <router-link :to="{name: 'product.add'}" class="btn btn-success btn-sm me-2"><i class="fa fa-plus-circle"></i> Add Product</router-link>
+                    <router-link to="/" class="btn btn-primary btn-sm text-white"><i class="fa fa-plus-circle"></i> Add Product By CSV</router-link>
+                  </div>
                 </div>
             </div>
         </div>

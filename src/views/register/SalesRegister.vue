@@ -6,7 +6,7 @@
                 products: [],
                 discount: '',
                 paymentTotal: '',
-                acceptTotal: '',
+                acceptTotal: 0,
                 refundTotal: '',
                 printAfterSale: '',
                 isPrintInvoice: true,
@@ -42,7 +42,7 @@
                         <div class="col-4">
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text">INV-</span>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" placeholder="Invoice Number">
                             </div>
                         </div>
                         <div class="col-3 g-0">
@@ -50,6 +50,9 @@
                                 <i class="fas fa-search"></i> Search </button>
                             <a href="http://127.0.0.1:8000/sales/add" class="btn btn-warning text-white btn-sm btn-radius">
                                 <i class="fa fa-sync-alt"></i> Refresh </a>
+                        </div>
+                        <div class="col-5 d-flex justify-content-end">                               
+                            <router-link target="_blank" class="btn btn-secondary btn-sm btn-radius me-1" :to="{name: 'register.sales'}"><i class="fas fa-hand-back-fist"></i> Hold</router-link>
                         </div>
                     </div>
                     <div class="row g-1">
@@ -105,7 +108,7 @@
                     </div>
                     <h6 class="text-center mt-1"><strong>OR</strong></h6>
                     <div class="d-flex align-items-center">
-                        <a id="addCustomerButton" href="javascript:void(0)" class="btn btn-info btn-sm" style="width: 50%;margin-right: 10px"><i class="fas fa-plus"></i> Add Customer</a>
+                        <a id="addCustomerButton" href="javascript:void(0)" class="btn btn-success btn-sm text-white" style="width: 50%;margin-right: 10px"><i class="fas fa-plus"></i> Add Customer</a>
                         <a id="removeCustomerButton" href="javascript:void(0)" class="btn btn-danger btn-sm" style="width: 50%"><i class="far fa-times-circle"></i> Remove</a>
                     </div>
                     <div class="customer-info d-none">
@@ -121,18 +124,18 @@
                         <tr class="bg-secondary bg-gradient text-white">
                             <th class="text-end" width="60%"><h6 ><strong>Sub Total </strong></h6></th>
                             <th class="text-end" width="35%">
-                                <input type="text" class="form-control form-control-sm sub-total" readonly>
+                                <input type="text" class="form-control form-control-sm sub-total text-end" readonly>
                             </th> 
                             <th><h5>/=</h5></th>                           
                         </tr>
                         <tr>
                             <th class="text-end"><h6><strong>Discount</strong></h6></th>
-                            <th ><input type="text" class="form-control form-control-sm discount" v-model="discount" @keyup="calculateRefundTotal"></th>
+                            <th ><input type="text" class="form-control form-control-sm discount text-end" v-model="discount" @keyup="calculateRefundTotal"></th>
                             <th><h5>%</h5></th>                            
                         </tr>
                         <tr class="bg-success bg-gradient text-white">
                             <th class="text-end"><h6><strong>Total</strong></h6></th>
-                            <th><input type="text" class="form-control form-control-sm total" v-model="total" readonly></th>
+                            <th><input type="text" class="form-control form-control-sm total text-end" v-model="total" readonly></th>
                             <th><h5>/=</h5></th>                            
                         </tr>                        
                     </thead>
@@ -143,12 +146,12 @@
                     <thead>
                         <tr class="bg-primary bg-gradient text-white">
                             <th class="text-end" width="60%"><h6><strong>Paid</strong></h6></th>
-                            <th width="35%"><input type="text" class="form-control form-control-sm payment-total" v-model="paymentTotal" @keyup="calculateRefundTotal"></th>
+                            <th width="35%"><input type="text" class="form-control form-control-sm payment-total text-end" v-model="paymentTotal" @keyup="calculateRefundTotal"></th>
                             <th><h5>/=</h5></th>                            
                         </tr>
                         <tr class="bg-danger bg-gradient text-white">
                             <th class="text-end"><h6><strong>Due</strong></h6></th>
-                            <th><input type="text" class="form-control form-control-sm amount-due" readonly></th>
+                            <th><input type="text" class="form-control form-control-sm amount-due text-end" readonly></th>
                             <th><h5>/=</h5></th>                            
                         </tr>                 
                     </thead>
@@ -160,12 +163,12 @@
                     <thead>
                         <tr class="bg-warning bg-gradient text-white">
                             <th class="text-end" width="60%"><h6><strong>Accept</strong></h6></th>
-                            <th width="35%"><input type="text" class="form-control form-control-sm accept-total" v-model="acceptTotal" @keyup="calculateRefundTotal"></th>
+                            <th width="35%"><input type="text" class="form-control form-control-sm accept-total text-end" v-model="acceptTotal" @keyup="calculateRefundTotal"></th>
                             <th><h5>/=</h5></th>                            
                         </tr>
                             <tr class="bg-info bg-gradient text-white">
                             <th class="text-end"><h6><strong>Refund</strong></h6></th>
-                            <th><input type="text" class="form-control form-control-sm refund-total" v-model="refundTotal" readonly></th>
+                            <th><input type="text" class="form-control form-control-sm refund-total text-end" v-model="refundTotal" readonly></th>
                             <th><h5>/=</h5></th>                            
                         </tr>                 
                     </thead>
@@ -186,14 +189,8 @@
                     </div>     
                 </div>
             </div>             
-            <div class="card bg-light" style="margin-top:0.5rem;">              
-                <table class="table-sm">
-                    <thead>
-                        <tr>
-                            <button class="btn btn-block btn-success" :disabled="completeBtnDisable"  v-html="completeButton" @click="storeSales"></button>                            
-                        </tr>             
-                    </thead>
-                </table>
+            <div class="col d-grid" style="margin-top:0.5rem;"> 
+                <button class="btn btn-success btn-radius" :disabled="completeBtnDisable"  v-html="completeButton"></button>  
             </div>   
         </div>		
     </div>
