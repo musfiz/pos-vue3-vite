@@ -14,9 +14,9 @@ import Customer from '../views/customer/Customer.vue'
 import Supplier from '../views/supplier/Supplier.vue'
 
 const routes = [
-  { path: "/", name: "home", component: Dashboard },
   { path: "/login", name: "login", component: Login },
-  { path: "/category", name: "category.view", component: Category },
+  { path: "/", name: "home", component: Dashboard, meta: {requiresAuth: true}},
+  { path: "/category", name: "category.view", component: Category, meta: {requiresAuth: true}},
   { path: "/subcategory", name: "subcategory.view", component: Subcategory },
   { path: "/vendor", name: "vendor.view", component: Vendor },
   { path: "/variant", name: "variant.view", component: Variant },

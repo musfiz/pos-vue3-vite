@@ -4,6 +4,7 @@ import './style.css'
 
 import App from './App.vue'
 import router from './router'
+import Auth from './helper/auth'
 
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
@@ -24,6 +25,7 @@ import VueAxios from 'vue-axios'
 
 
 const app = createApp(App)
+
 app.component('font-awsome-icon', FontAwesomeIcon)
 app.component('Multiselect', Multiselect)
 app.use(router)
