@@ -7,6 +7,9 @@ export default {
     return {
       layout: 'Index'
     }
+  },
+  mounted(){
+
   }
 }
 </script>

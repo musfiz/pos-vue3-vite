@@ -15,7 +15,7 @@ import Supplier from '../views/supplier/Supplier.vue'
 
 const routes = [
   { path: "/login", name: "login", component: Login },
-  { path: "/", name: "home", component: Dashboard, meta: {requiresAuth: true}},
+  { path: "/home", name: "home", component: Dashboard, meta: {requiresAuth: true}},
   { path: "/category", name: "category.view", component: Category, meta: {requiresAuth: true}},
   { path: "/subcategory", name: "subcategory.view", component: Subcategory },
   { path: "/vendor", name: "vendor.view", component: Vendor },

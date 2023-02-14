@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import routes from './router'
-import Auth from '../helper/auth'
+
 
 
 const router = createRouter({
@@ -10,12 +10,14 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth) ) {
-      if (Auth.check()) {
-          next();
-          return;
-      } else {
-          router.push('/login');
-      }
+    next()
+    return
+      // if (Auth.check()) {
+      //     next();
+      //     return;
+      // } else {
+      //     router.push('/login');
+      // }
   } else {
       next();
   }

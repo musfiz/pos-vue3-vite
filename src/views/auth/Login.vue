@@ -14,17 +14,17 @@
 
               <div class="input-group mb-3">
                 <span class="input-group-text" id="email">Email &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                <input type="text" class="form-control" aria-describedby="email" placeholder="Enter email or username">
+                <input type="text" class="form-control" aria-describedby="email" placeholder="Enter email or username" v-model="user.email">
               </div>
               <div class="input-group mb-3">
                 <span class="input-group-text" id="password">Password</span>
-                <input type="password" class="form-control" aria-describedby="password" placeholder="Enter password">
+                <input type="password" class="form-control" placeholder="Enter password" v-model="user.password">
               </div>
               <div class="mb-2">
                 <input class="form-check-input" type="checkbox" value="" id="checkbox"> Remember Me
               </div>
               <div class="text-center">
-                <button type="submit" class="btn btn-success px-5 mb-5 w-100" style="border-radius: 0;">Login</button>
+                <button type="submit" class="btn btn-success px-5 mb-5 w-100" style="border-radius: 0;" @click="handleSubmit">Login</button>
               </div>
             </form>
           </div>
@@ -43,30 +43,30 @@
 </template>
 
 <script lang="ts">
-// import Auth from '../../Auth.js';
+import router from '../../router';
 export default {
   data() {
       return {
-          user:{},
-          error: null
+          user:{
+            'email': '',
+            'password': ''
+          },
+          error: [],
       }
   },
   methods: {
-      handleSubmit(e) {
-          e.preventDefault()
-          if (this.user.password.length > 0) {
-              this.axios.post('/api/login', this.user)
-                  .then(({data}) => {
-                      // Auth.login(data.access_token,data.user); //set local storage
-                      // this.$router.push('/dashboard');
-                      // this.$store.dispatch('login', data)
-                      // this.$router.push({name: 'dashboard'})
-                  })
-                  .catch((error) => {
-                      console.log(error);
-                  });
-          }
-      },
+    handleSubmit(e) {
+    e.preventDefault()
+      this.axios.post('/login', this.user)
+        .then((res) => {
+            console.log(res)
+            // this.$store.dispatch('login', data)
+            this.$router.push({name: 'home'})
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
   },
 }
 </script>

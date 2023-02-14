@@ -4,7 +4,8 @@ import './style.css'
 
 import App from './App.vue'
 import router from './router'
-import Auth from './helper/auth'
+
+import store from './store'
 
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
@@ -20,8 +21,10 @@ dom.watch();
 import Multiselect from 'vue-multiselect'
 import 'vue-multiselect/dist/vue-multiselect.css'
 
-import axios from 'axios'
+import axios from './helper/axios'
 import VueAxios from 'vue-axios'
+
+import cookies from 'vue3-cookies'
 
 
 const app = createApp(App)
@@ -29,7 +32,9 @@ const app = createApp(App)
 app.component('font-awsome-icon', FontAwesomeIcon)
 app.component('Multiselect', Multiselect)
 app.use(router)
+app.use(store)
 app.use(VueAxios, axios)
+app.use(cookies, {expireTimes: '2d', secure: true, sameSite: "None"})
 app.mount('#app')
 
 import "bootstrap/dist/js/bootstrap.js"
