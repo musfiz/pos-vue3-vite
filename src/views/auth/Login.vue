@@ -59,12 +59,12 @@ export default {
     e.preventDefault()
       this.axios.post('/login', this.user)
         .then((res) => {
-            console.log(res)
-            // this.$store.dispatch('login', data)
+            console.log(res.data.data)
+            // this.$store.dispatch('login', res.data.data)
             this.$router.push({name: 'home'})
         })
         .catch((error) => {
-            console.log(error);
+            console.log(error.response.data);
         });
     }
   },
