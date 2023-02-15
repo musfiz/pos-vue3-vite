@@ -1,3 +1,19 @@
+<script lang="ts">
+export default {
+  methods: {
+    logout(){
+      this.axios.post('/logout')
+        .then(({data}) => {
+          this.$store.dispatch('logout', {})
+          // console.log(data)
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
+  }
+}
+</script>
 <template>
   <div>
     <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
@@ -72,7 +88,7 @@
                   <li><router-link class="dropdown-item" to="/"><i class="fas fa-database"></i> DB Backup</router-link></li>
                   <li><router-link class="dropdown-item" to="/"><i class="fas fa-upload"></i> DB Restore</router-link></li>
                   <li><hr class="dropdown-divider"></li>
-                  <li><router-link class="dropdown-item" to="/login"><i class="fas fa-database"></i> Logout</router-link></li>
+                  <li><a class="dropdown-item" href="javascript:void(0)" @click="logout"><i class="fas fa-database"></i> Logout</a></li>
                 </ul>
               </li>
             </ul>

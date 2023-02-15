@@ -1,4 +1,3 @@
-import Login from '../views/auth/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Category from '../views/category/Category.vue'
 import Subcategory from '../views/subcategory/Subcategory.vue'
@@ -12,10 +11,10 @@ import SalesRegister from '../views/register/SalesRegister.vue'
 import PurchaseRegister from '../views/register/PurchaseRegister.vue'
 import Customer from '../views/customer/Customer.vue'
 import Supplier from '../views/supplier/Supplier.vue'
+import PageNotFound from '../views/layouts/PageNotFound.vue'
 
 const routes = [
-  { path: "/login", name: "login", component: Login },
-  { path: "/home", name: "home", component: Dashboard, meta: {requiresAuth: true}},
+  { path: "/", name: "home", component: Dashboard, meta: {requiresAuth: true} },
   { path: "/category", name: "category.view", component: Category, meta: {requiresAuth: true}},
   { path: "/subcategory", name: "subcategory.view", component: Subcategory },
   { path: "/vendor", name: "vendor.view", component: Vendor },
@@ -28,6 +27,7 @@ const routes = [
   { path: "/register/purchase", name: "register.purchase", component: PurchaseRegister },
   { path: "/customer", name: "customer.view", component: Customer },
   { path: "/supplier", name: "supplier.view", component: Supplier },
+  { path: '/:pathMatch(.*)*',component: PageNotFound } 
 ]
 
 export default routes;

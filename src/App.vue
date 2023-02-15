@@ -3,13 +3,10 @@ import Login from './views/auth/Login.vue'
 import Index from './views/layouts/Index.vue'
 export default {
   components: {Login, Index},
-  data(){
-    return {
-      layout: 'Index'
-    }
-  },
-  mounted(){
-
+  computed: {
+    layout():string{
+      return this.$store.getters.isLayout
+    }    
   }
 }
 </script>

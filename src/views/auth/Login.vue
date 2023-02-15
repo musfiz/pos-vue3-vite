@@ -43,28 +43,26 @@
 </template>
 
 <script lang="ts">
-import router from '../../router';
 export default {
   data() {
-      return {
-          user:{
-            'email': '',
-            'password': ''
-          },
-          error: [],
-      }
+    return {
+      user:{
+        'email': 'admin@mail.com',
+        'password': 'admin365'
+      },
+      error: [],
+    }
   },
   methods: {
     handleSubmit(e) {
-    e.preventDefault()
+      e.preventDefault()
       this.axios.post('/login', this.user)
-        .then((res) => {
-            console.log(res.data.data)
-            // this.$store.dispatch('login', res.data.data)
-            this.$router.push({name: 'home'})
+        .then(({data}) => {
+          this.$store.dispatch('login', data.data)
+          // this.$cookies.remove('token')            
         })
         .catch((error) => {
-            console.log(error.response.data);
+            console.log(error);
         });
     }
   },

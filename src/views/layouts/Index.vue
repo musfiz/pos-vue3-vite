@@ -3,11 +3,6 @@ import Nav from './Nav.vue'
 export default {
   props:{},
   components: {Nav},
-  data(){
-    return {
-      
-    }
-  }
 }
 </script>
 

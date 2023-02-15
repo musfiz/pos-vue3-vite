@@ -1,21 +1,37 @@
+import { useCookies } from 'vue3-cookies'
+const { cookies } = useCookies()
+import axios from 'axios'
+
 export const authStore = {
   state: ()=>({
-      authStatus: false, //check status if user logged in or not
-      authUser: {}, // check auth user information
-      isLayout: 'Login'
+    isAuth: cookies.get('isAuth') || false,
+    isLayout: cookies.get('isLayout') || 'Login',
+    authUser: cookies.get('user') || {} // check auth user information
   }),
 
   mutations:{
-    updateLogin(state, payload){
-      state.authUser = payload.user
-      state.authStatus = true
+    updateLogin(state, payload){      
       // Store token to cookies
+      cookies.set('isAuth', 'true')
+      cookies.set('isLayout', 'Index')
+      cookies.set('user', payload.user);
+      cookies.set('token', payload.token);
+
+      state.isAuth = true
+      state.isLayout = 'Index'
+      state.authUser = payload.user
+      axios.defaults.headers.common['Authorization'] = 'Bearer '+ payload.token
     },
 
     updateLogout(state, payload){
-      state.authUser = {}
-      state.authStatus = false
+      state.authUser = payload
+      state.isAuth = false
+      state.isLayout = 'Login'
       //Removing token from cookie
+      cookies.remove('isAuth')
+      cookies.remove('isLayout')
+      cookies.remove('user');
+      cookies.remove('token');
     },
 
     updateLayout(state, payload){
@@ -38,8 +54,8 @@ export const authStore = {
   },  
 
   getters: {
-    isLoggedIn(state){
-      return state.authStatus
+    isAuth(state){
+      return state.isAuth
     },
 
     authUser(state){
