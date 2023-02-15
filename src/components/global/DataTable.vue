@@ -1,6 +1,7 @@
 <template>
   <div>
       <easy-data-table 
+          table-class-name="customize-table"
           :headers="headers" 
           :items="items"
           v-model:server-options="serverOptions" 
@@ -12,7 +13,14 @@
           @update-sort="updateSort"
           show-index
           border-cell
-          buttons-pagination/>
+          buttons-pagination>
+          <template #item-operation="item">
+            <div class="operation-wrapper">
+                <button class="btn btn-outline-success btn-sm"><i class="fas fa-edit"></i></button> &nbsp;
+                <button class="btn btn-outline-danger btn-sm"><i class="fas fa-trash"></i></button>
+            </div>
+    </template>
+        </easy-data-table>
   </div>
 </template>
 <script lang="ts">
@@ -42,9 +50,9 @@ export default {
           serverItemsLength: 0,
           serverOptions : {
               page: 1,
-              rowsPerPage: 5,                
+              rowsPerPage: 10,                
           },
-          rowsItems: [5, 10, 20, 40, 80],
+          rowsItems: [10, 20, 40, 80, 100, 500],
           sortBy: 'id',
           sortType: 'asc',
       }
@@ -56,10 +64,10 @@ export default {
       async getServerData(){
           this.loading = true
           await this.axios.get(`${this.url}?page=${this.serverOptions.page}&limit=${this.serverOptions.rowsPerPage}&sortBy=${this.sortBy}&sortType=${this.sortType}`)
-          .then(response => {
-              // console.log(response.data.data);
-              this.items = response.data.data;
-              this.serverItemsLength = response.data.total
+          .then(({data}) => {
+              console.log(data.data.data);
+              this.items = data.data.data;
+              this.serverItemsLength = data.data.total
               this.loading = false
           })
           .catch(function (error) {
@@ -76,8 +84,15 @@ export default {
   watch: {
     serverOptions(value) {
       this.serverOptions.page = value.page
-    //   this.getServerData()
+      this.getServerData()
     },
   },
 }
 </script>
+
+<style>
+    .customize-table{
+        --easy-table-header-font-size: 15px;
+        --easy-table-body-row-font-size: 15px;
+    }
+</style>

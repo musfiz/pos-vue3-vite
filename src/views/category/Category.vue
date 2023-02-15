@@ -1,3 +1,19 @@
+<script lang="ts">
+import DataTable from '../../components/global/DataTable.vue'
+export default {
+    components: {DataTable},
+    data(){
+        return {
+            headers: [
+                { text: "Category Name", value: "category_name"},
+                { text: "Description", value: "category_description"},
+                { text: "Action", value: "operation", width: 100 }
+            ]
+        }
+    },
+}
+</script>
+
 <template>
   <div>
     <!-- row -->
@@ -42,7 +58,7 @@
         <div class="col">
           <div class="card">
             <div class="card-body">
-              
+              <DataTable :url="'/category'" :headers="headers" :sort="true" />
             </div>
           </div>
         </div>

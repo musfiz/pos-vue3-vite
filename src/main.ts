@@ -23,8 +23,8 @@ import 'vue-multiselect/dist/vue-multiselect.css'
 
 import axios from './helper/axios'
 import VueAxios from 'vue-axios'
-
 import cookies from 'vue3-cookies'
+
 
 
 const app = createApp(App)
