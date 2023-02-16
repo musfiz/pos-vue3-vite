@@ -1,13 +1,14 @@
 <script lang="ts">
 import Login from './views/auth/Login.vue'
 import Index from './views/layouts/Index.vue'
+
 export default {
   components: {Login, Index},
   computed: {
     layout():string{
       return this.$store.getters.isLayout
     }    
-  }
+  },
 }
 </script>
 

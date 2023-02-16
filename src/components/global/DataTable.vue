@@ -65,7 +65,6 @@ export default {
           this.loading = true
           await this.axios.get(`${this.url}?page=${this.serverOptions.page}&limit=${this.serverOptions.rowsPerPage}&sortBy=${this.sortBy}&sortType=${this.sortType}`)
           .then(({data}) => {
-              console.log(data.data.data);
               this.items = data.data.data;
               this.serverItemsLength = data.data.total
               this.loading = false

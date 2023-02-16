@@ -25,9 +25,20 @@ import axios from './helper/axios'
 import VueAxios from 'vue-axios'
 import cookies from 'vue3-cookies'
 
+import Vue3Toastify, { toast , type ToastContainerOptions } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 
 const app = createApp(App)
+
+app.use(Vue3Toastify, {
+  autoClose: 3000,
+  theme: 'colored',
+  dangerouslyHTMLString: true,
+  multiple: false
+} as ToastContainerOptions);
+
+app.config.globalProperties.toast = toast
 
 app.component('font-awsome-icon', FontAwesomeIcon)
 app.component('Multiselect', Multiselect)

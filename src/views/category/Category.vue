@@ -1,7 +1,16 @@
 <script lang="ts">
+import { Form, Field, ErrorMessage } from 'vee-validate'
+import * as Yup from 'yup'
 import DataTable from '../../components/global/DataTable.vue'
 export default {
-    components: {DataTable},
+    setup(){
+        const schema = Yup.object().shape({
+            category_name: Yup.string()
+                .required('Category name is required')
+        })
+        return { schema }
+    },
+    components: {DataTable, Form, Field, ErrorMessage},
     data(){
         return {
             headers: [
@@ -11,6 +20,20 @@ export default {
             ]
         }
     },
+    mounted(){
+        // this.toast.success('<strong> Login successfully. <i class="fas fa-smile"></i> </strong>')
+    },
+    methods: {
+        // validateName(value:String){
+        //     if (!value || value.length < 1) {
+        //         return 'This field is required';
+        //     }
+        //     return true
+        // },
+        onSubmit(values:Object){
+            console.log(JSON.stringify(values));
+        }
+    }
 }
 </script>
 
@@ -33,21 +56,24 @@ export default {
         <div class="col">
             <div class="card">
                 <div class="card-body">
-                    <form action="" autocomplete="off">                        
+                    <Form autocomplete="off" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">                        
                         <div class="row"> 
-                             <div class="col-3">
+                            <div class="col-3">
                                 <label class="form-label">Category Name <span class="required">(*)</span></label>
-                               <input type="text" class="form-control" placeholder="Category Name">
+                                <Field type="text" class="form-control" :class="{'is-invalid' : errors.category_name}" placeholder="Category Name" name="category_name" />
+                                    <div class="invalid-feedback">
+                                        {{ errors.category_name }}
+                                    </div> 
                             </div>                           
                             <div class="col-5 g-0">
                                 <label class="form-label">Category Description </label>
-                                <input type="text" class="form-control" placeholder="Category Description">                                
+                                <Field type="text" class="form-control" placeholder="Category Description" name="category_description" />                                
                             </div>
                             <div class="col-2" style="margin-top: 31px">
                                 <button type="submit" class="btn btn-primary btn-radius"><i class="fas fa-hdd"></i> Store Category </button> &nbsp;
                             </div>
                         </div>                    
-                    </form>
+                    </Form>
                 </div>
             </div>                       
         </div>

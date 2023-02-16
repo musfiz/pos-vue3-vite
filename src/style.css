@@ -93,3 +93,7 @@ body {
 .form-control:focus, .form-select:focus{
   box-shadow: none;
 }
+
+.invalid-feedback{
+  font-size: 0.8rem
+}
