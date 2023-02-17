@@ -1,16 +1,15 @@
 <script lang="ts">
-import { Form, Field, ErrorMessage } from 'vee-validate'
-import * as Yup from 'yup'
+// import * as Yup from 'yup'
 import DataTable from '../../components/global/DataTable.vue'
 export default {
-    setup(){
-        const schema = Yup.object().shape({
-            category_name: Yup.string()
-                .required('The category name field is required.')
-        })
-        return { schema }
-    },
-    components: {DataTable, Form, Field, ErrorMessage},
+    // setup(){
+    //     const schema = Yup.object().shape({
+    //         category_name: Yup.string()
+    //             .required('The category name field is required.')
+    //     })
+    //     return { schema } //you can use this schema on template option
+    // },
+    components: {DataTable},
     data(){
         return {
             headers: [
@@ -18,22 +17,30 @@ export default {
                 { text: "Description", value: "category_description"},
                 { text: "Action", value: "operation", width: 100 }
             ],
-            errors: []
+          
+            categoryName: '',
+            categoryDescription: '',
+            categoryNameError: ''            
         }
     },
     mounted(){
         // this.toast.success('<strong> Login successfully. <i class="fas fa-smile"></i> </strong>')
     },
     methods: {
-        onSubmit(params:Object){
+        onSubmit(e){
+            e.preventDefault()
+            const params:object = {
+                'category_name': this.categoryName,
+                'category_description': this.categoryDescription
+            }
             this.axios.post('category', params)
             .then(({data}) => {
                 this.toast.success(data.message)
                 this.$refs.dataTable.reload()
             })
             .catch(({response}) => {
-            //    console.log(response.data.errors)
-                this.err = response.data.errors
+                // console.log(response.data.errors.category_name[0])
+                this.categoryNameError = response.data.errors.category_name[0]
             })
         },
 
@@ -60,24 +67,24 @@ export default {
         <div class="col">
             <div class="card">
                 <div class="card-body">
-                    <Form autocomplete="off" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">                        
+                    <form autocomplete="off" @submit="onSubmit">                        
                         <div class="row"> 
                             <div class="col-3">
                                 <label class="form-label">Category Name <span class="required">(*)</span></label>
-                                <Field type="text" class="form-control" :class="{'is-invalid' : errors.category_name}" placeholder="Category Name" name="category_name" />
-                                    <div class="invalid-feedback">
-                                        {{ errors.category_name }}
-                                    </div> 
+                                <input type="text" class="form-control" :class="{'is-invalid': categoryNameError}" placeholder="Category Name" v-model="categoryName">
+                                <div class="invalid-feedback">
+                                    {{ categoryNameError }}
+                                </div> 
                             </div>                           
                             <div class="col-5 g-0">
                                 <label class="form-label">Category Description </label>
-                                <Field type="text" class="form-control" placeholder="Category Description" name="category_description" />                                
+                                <input type="text" class="form-control" placeholder="Category Description" v-model="categoryDescription">
                             </div>
                             <div class="col-2" style="margin-top: 31px">
                                 <button type="submit" class="btn btn-primary btn-radius"><i class="fas fa-hdd"></i> Store Category </button> &nbsp;
                             </div>
                         </div>                    
-                    </Form>
+                    </form>
                 </div>
             </div>                       
         </div>

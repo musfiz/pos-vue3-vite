@@ -17,7 +17,6 @@
     "axios": "^1.3.2",
     "bootstrap": "^5.2.3",
     "file-saver": "^2.0.5",
-    "vee-validate": "^4.7.4",
     "vue": "^3.2.45",
     "vue-axios": "^3.5.2",
     "vue-multiselect": "^3.0.0-beta.1",
@@ -25,8 +24,7 @@
     "vue3-cookies": "^1.0.6",
     "vue3-easy-data-table": "^1.5.31",
     "vue3-toastify": "^0.0.9",
-    "vuex": "^4.1.0",
-    "yup": "^1.0.0"
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
