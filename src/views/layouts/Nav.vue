@@ -3,12 +3,13 @@ export default {
   methods: {
     logout(){
       this.axios.post('/logout')
-        .then(({data}) => {
-          this.$store.dispatch('logout', {})
+        .then(({data}) => {          
+          this.$store.dispatch('logout', {})  
+          this.toast.info('<strong>'+ data.message +'</strong>')        
           // console.log(data)
         })
         .catch((error) => {
-            console.log(error);
+          this.toast.error('<strong>Something went wrong !</strong>')
         });
     }
   }

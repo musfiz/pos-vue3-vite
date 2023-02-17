@@ -78,6 +78,9 @@ export default {
               this.sortBy = val.sortBy
               this.sortType = val.sortType
           }
+      },
+      reload(){
+        this.getServerData()
       }
   },
   watch: {

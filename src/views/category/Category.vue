@@ -6,7 +6,7 @@ export default {
     setup(){
         const schema = Yup.object().shape({
             category_name: Yup.string()
-                .required('Category name is required')
+                .required('The category name field is required.')
         })
         return { schema }
     },
@@ -17,22 +17,26 @@ export default {
                 { text: "Category Name", value: "category_name"},
                 { text: "Description", value: "category_description"},
                 { text: "Action", value: "operation", width: 100 }
-            ]
+            ],
+            errors: []
         }
     },
     mounted(){
         // this.toast.success('<strong> Login successfully. <i class="fas fa-smile"></i> </strong>')
     },
     methods: {
-        // validateName(value:String){
-        //     if (!value || value.length < 1) {
-        //         return 'This field is required';
-        //     }
-        //     return true
-        // },
-        onSubmit(values:Object){
-            console.log(JSON.stringify(values));
-        }
+        onSubmit(params:Object){
+            this.axios.post('category', params)
+            .then(({data}) => {
+                this.toast.success(data.message)
+                this.$refs.dataTable.reload()
+            })
+            .catch(({response}) => {
+            //    console.log(response.data.errors)
+                this.err = response.data.errors
+            })
+        },
+
     }
 }
 </script>
@@ -84,12 +88,11 @@ export default {
         <div class="col">
           <div class="card">
             <div class="card-body">
-              <DataTable :url="'/category'" :headers="headers" :sort="true" />
+              <DataTable :url="'/category'" :headers="headers" :sort="true" ref="dataTable"/>
             </div>
           </div>
         </div>
       </div>
       <!-- row -->
-
   </div>
 </template>

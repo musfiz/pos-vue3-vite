@@ -58,11 +58,13 @@ export default {
       e.preventDefault()
       this.axios.post('/login', this.user)
         .then(({data}) => {
-          this.$store.dispatch('login', data.data)
-          // this.$cookies.remove('token')            
+          this.toast.success('<strong>'+ data.message +'</strong>', {autoClose: 2000})
+          setTimeout(() => {
+            this.$store.dispatch('login', data.data)
+          }, 3000)          
         })
         .catch((error) => {
-            console.log(error);
+          this.toast.error('<strong>Something went wrong !</strong>')
         });
     }
   },
