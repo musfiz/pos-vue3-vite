@@ -1,3 +1,98 @@
+<script lang="ts">
+import DataTable from '../../components/global/DataTable.vue'
+export default {
+    components: {DataTable},
+    data(){
+        return {
+            headers: [
+                { text: "Category", value: "category_name"},
+                { text: "Subcategory", value: "subcategory_name"},
+                { text: "Description", value: "subcategory_description"},
+                { text: "Action", value: "operation", width: 100 }
+            ], 
+            id: '', 
+            categoryId: '',        
+            subcategoryName: '',
+            subcategoryDescription: '',
+            categoryIdError: '' ,
+            subcategoryNameError:'',
+            submitBtn: 'Store'         
+        }
+    },
+    methods: {
+        onSubmit(e){
+            e.preventDefault()
+            
+            if(this.id){
+                let params:Object = {
+                    '_method': 'PUT',
+                    'category_id': this.categoryId,
+                    'subcategory_name': this.subcategoryName,
+                    'subcategory_description': this.subcategoryDescription
+                }
+                this.axios.put('subcategory/'+ this.id, params)
+                    .then(({data}) => {
+                        this.toast.info(data.message)
+                        this.onRefresh()
+                        this.$refs.dataTable.reload()
+                    })
+                    .catch(({response}) => {
+                        this.subcategoryNameError = response.data.errors.category_name[0]
+                    })
+            }else{
+                let params:Object = {
+                    'category_id': this.categoryId,
+                    'subcategory_name': this.subcategoryName,
+                    'subcategory_description': this.subcategoryDescription
+                }
+                this.axios.post('subcategory', params)
+                    .then(({data}) => {
+                        this.toast.success(data.message)
+                        this.onRefresh()
+                        this.$refs.dataTable.reload()
+                    })
+                    .catch(({response}) => {
+                        // console.log(response.data.errors.category_name[0])
+                        this.categoryNameError = response.data.errors.category_name[0]
+                    })
+            }
+        },
+
+        onEdit(item:Object){
+            this.submitBtn = 'Update'
+            this.id = item.id
+            this.categoryId = item.id
+            this.subcategoryName = item.subcategory_name
+            this.subcategoryDescription = item.subcategory_description
+        },
+
+        onDelete(item:Object){
+            this.axios.delete('subcategory/'+ item.id, {'_method': 'DELETE'})
+                .then(({data}) => {
+                    this.$swal.fire(
+                        'Deleted!',
+                        data.message,
+                        'success'
+                    )
+                    this.$refs.dataTable.reload()
+                })
+                .catch((error) => {
+                    console.log(error);                    
+                })
+        },
+
+        onRefresh(){
+            this.id = ''
+            this.categoryId = ''
+            this.subcategoryName = ''
+            this.subcategoryDescription = ''
+            this.submitBtn = 'Store'
+            this.$refs.dataTable.reload()
+        }
+    }
+}
+</script>
+
 <template>
   <div>
     <!-- row -->
@@ -17,21 +112,27 @@
         <div class="col">
             <div class="card">
                 <div class="card-body">
-                    <form action="" autocomplete="off">                        
+                    <form autocomplete="off" @submit="onSubmit">                        
                         <div class="row">
                             <div class="col-3">
                                 <label class="form-label">Category Name <span class="required">(*)</span></label>
-                                <select class="form-select">
+                                <select class="form-select is-invalid" v-model="categoryId" :class="{'is-invalid': categoryIdError}">
                                     <option value="">Select Type</option>
                                 </select>
+                                <div class="invalid-feedback">
+                                    Test
+                                </div> 
                             </div>    
                             <div class="col-3">
                                 <label class="form-label">Subcategory Name <span class="required">(*)</span></label>
-                               <input type="text" class="form-control" placeholder="Category Name">
+                               <input type="text" class="form-control" :class="{'is-invalid': subcategoryNameError}" placeholder="Subcategory Name" v-model="subcategoryName">
+                               <div class="invalid-feedback">
+                                    {{ subcategoryNameError }}
+                                </div> 
                             </div>                           
                             <div class="col-4 g-0">
                                 <label class="form-label">Subcategory Description </label>
-                                <input type="text" class="form-control" placeholder="Category Description">                                
+                                <input type="text" class="form-control" placeholder="Subcategory Description" v-model="subcategoryDescription">                                
                             </div>
                             <div class="col-2" style="margin-top: 31px">
                                 <button type="submit" class="btn btn-primary btn-radius"><i class="fas fa-hdd"></i> Store Subcategory </button> &nbsp;
@@ -48,7 +149,7 @@
         <div class="col">
           <div class="card">
             <div class="card-body">
-              
+                <DataTable :url="'/subcategory'" :headers="headers" :sort="true" ref="dataTable" @onEdit="onEdit" @onDelete="onDelete"/>
             </div>
           </div>
         </div>

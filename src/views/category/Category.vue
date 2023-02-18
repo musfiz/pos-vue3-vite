@@ -16,11 +16,12 @@ export default {
                 { text: "Category Name", value: "category_name"},
                 { text: "Description", value: "category_description"},
                 { text: "Action", value: "operation", width: 100 }
-            ],
-          
+            ], 
+            id: '',         
             categoryName: '',
             categoryDescription: '',
-            categoryNameError: ''            
+            categoryNameError: '' ,
+            submitBtn: 'Store'         
         }
     },
     mounted(){
@@ -29,21 +30,69 @@ export default {
     methods: {
         onSubmit(e){
             e.preventDefault()
-            const params:object = {
-                'category_name': this.categoryName,
-                'category_description': this.categoryDescription
+            
+            if(this.id){
+                let params:Object = {
+                    '_method': 'PUT',
+                    'category_name': this.categoryName,
+                    'category_description': this.categoryDescription
+                }
+                this.axios.put('category/'+ this.id, params)
+                    .then(({data}) => {
+                        this.toast.info(data.message)
+                        this.onRefresh()
+                        this.$refs.dataTable.reload()
+                    })
+                    .catch(({response}) => {
+                        this.categoryNameError = response.data.errors.category_name[0]
+                    })
+            }else{
+                let params:Object = {
+                    'category_name': this.categoryName,
+                    'category_description': this.categoryDescription
+                }
+                this.axios.post('category', params)
+                    .then(({data}) => {
+                        this.toast.success(data.message)
+                        this.onRefresh()
+                        this.$refs.dataTable.reload()
+                    })
+                    .catch(({response}) => {
+                        // console.log(response.data.errors.category_name[0])
+                        this.categoryNameError = response.data.errors.category_name[0]
+                    })
             }
-            this.axios.post('category', params)
-            .then(({data}) => {
-                this.toast.success(data.message)
-                this.$refs.dataTable.reload()
-            })
-            .catch(({response}) => {
-                // console.log(response.data.errors.category_name[0])
-                this.categoryNameError = response.data.errors.category_name[0]
-            })
         },
 
+        onEdit(item:Object){
+            this.submitBtn = 'Update'
+            this.id = item.id
+            this.categoryName = item.category_name
+            this.categoryDescription = item.category_description
+        },
+
+        onDelete(item:Object){
+            this.axios.delete('category/'+ item.id, {'_method': 'DELETE'})
+                .then(({data}) => {
+                    this.$swal.fire(
+                        'Deleted!',
+                        data.message,
+                        'success'
+                    )
+                    this.$refs.dataTable.reload()
+                })
+                .catch((error) => {
+                    console.log(error);                    
+                })
+        },
+
+        onRefresh(){
+            this.id = ''
+            this.categoryName = ''
+            this.categoryDescription = ''
+            this.submitBtn = 'Store'
+            this.$refs.dataTable.reload()
+        }
     }
 }
 </script>
@@ -67,7 +116,8 @@ export default {
         <div class="col">
             <div class="card">
                 <div class="card-body">
-                    <form autocomplete="off" @submit="onSubmit">                        
+                    <form autocomplete="off" @submit="onSubmit">  
+                        <input type="hidden" v-model="id">                      
                         <div class="row"> 
                             <div class="col-3">
                                 <label class="form-label">Category Name <span class="required">(*)</span></label>
@@ -80,8 +130,9 @@ export default {
                                 <label class="form-label">Category Description </label>
                                 <input type="text" class="form-control" placeholder="Category Description" v-model="categoryDescription">
                             </div>
-                            <div class="col-2" style="margin-top: 31px">
-                                <button type="submit" class="btn btn-primary btn-radius"><i class="fas fa-hdd"></i> Store Category </button> &nbsp;
+                            <div class="col-auto d-flex" style="margin-top: 31px">
+                                <button type="submit" class="btn btn-primary btn-radius"><i class="fas fa-hdd"></i> {{ submitBtn }} Category </button> &nbsp;
+                                <a class="btn btn-success btn-radius" @click="onRefresh"><i class="fas fa-refresh"></i> Refresh </a> &nbsp;
                             </div>
                         </div>                    
                     </form>
@@ -95,7 +146,7 @@ export default {
         <div class="col">
           <div class="card">
             <div class="card-body">
-              <DataTable :url="'/category'" :headers="headers" :sort="true" ref="dataTable"/>
+              <DataTable :url="'/category'" :headers="headers" :sort="true" ref="dataTable" @onEdit="onEdit" @onDelete="onDelete"/>
             </div>
           </div>
         </div>

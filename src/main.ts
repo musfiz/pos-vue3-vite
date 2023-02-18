@@ -25,8 +25,11 @@ import axios from './helper/axios'
 import VueAxios from 'vue-axios'
 import cookies from 'vue3-cookies'
 
-import Vue3Toastify, { toast , type ToastContainerOptions } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
+import Vue3Toastify, { toast , type ToastContainerOptions } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
+
+import VueSweetalert2 from 'vue-sweetalert2'
+import 'sweetalert2/dist/sweetalert2.min.css'
 
 
 const app = createApp(App)
@@ -36,7 +39,9 @@ app.use(Vue3Toastify, {
   theme: 'colored',
   dangerouslyHTMLString: true,
   multiple: false
-} as ToastContainerOptions);
+} as ToastContainerOptions)
+
+app.use(VueSweetalert2)
 
 app.config.globalProperties.toast = toast
 

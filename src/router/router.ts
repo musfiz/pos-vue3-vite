@@ -16,7 +16,7 @@ import PageNotFound from '../views/layouts/PageNotFound.vue'
 const routes = [
   { path: "/", name: "home", component: Dashboard, meta: {requiresAuth: true} },
   { path: "/category", name: "category.view", component: Category, meta: {requiresAuth: true}},
-  { path: "/subcategory", name: "subcategory.view", component: Subcategory },
+  { path: "/subcategory", name: "subcategory.view", component: Subcategory, meta: {requiresAuth: true}},
   { path: "/vendor", name: "vendor.view", component: Vendor },
   { path: "/variant", name: "variant.view", component: Variant },
   { path: "/product", name: "product.view", component: Product },

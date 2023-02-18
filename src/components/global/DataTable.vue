@@ -1,26 +1,26 @@
 <template>
   <div>
       <easy-data-table 
-          table-class-name="customize-table"
-          :headers="headers" 
-          :items="items"
-          v-model:server-options="serverOptions" 
-          :server-items-length="serverItemsLength"
-          :loading="loading"
-          :rows-items="rowsItems"
-          :sort-by="sortBy"
-          :sort-type="sortType"
-          @update-sort="updateSort"
-          show-index
-          border-cell
-          buttons-pagination>
-          <template #item-operation="item">
-            <div class="operation-wrapper">
-                <button class="btn btn-outline-success btn-sm"><i class="fas fa-edit"></i></button> &nbsp;
-                <button class="btn btn-outline-danger btn-sm"><i class="fas fa-trash"></i></button>
-            </div>
-    </template>
-        </easy-data-table>
+        table-class-name="customize-table"
+        :headers="headers" 
+        :items="items"
+        v-model:server-options="serverOptions" 
+        :server-items-length="serverItemsLength"
+        :loading="loading"
+        :rows-items="rowsItems"
+        :sort-by="sortBy"
+        :sort-type="sortType"
+        @update-sort="updateSort"
+        show-index
+        border-cell
+        buttons-pagination>
+        <template #item-operation="item">
+          <div class="operation-wrapper">
+              <button class="btn btn-outline-success btn-sm" @click="onEdit(item)"><i class="fas fa-edit"></i></button> &nbsp;
+              <button class="btn btn-outline-danger btn-sm" @click="onDelete(item)"><i class="fas fa-trash"></i></button>
+          </div>
+        </template>
+    </easy-data-table>
   </div>
 </template>
 <script lang="ts">
@@ -74,13 +74,32 @@ export default {
           });
       },
       updateSort(val){
-          if(this.sort){
-              this.sortBy = val.sortBy
-              this.sortType = val.sortType
-          }
+            if(this.sort){
+                this.sortBy = val.sortBy
+                this.sortType = val.sortType
+            }
       },
       reload(){
         this.getServerData()
+      },
+      onEdit(item:Object){
+        this.$emit('onEdit', item)
+      },
+      onDelete(item:Object){
+        this.$swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.$emit('onDelete', item)
+          }
+        })
+        
       }
   },
   watch: {
