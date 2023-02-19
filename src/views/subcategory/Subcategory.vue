@@ -10,13 +10,15 @@ export default {
                 { text: "Description", value: "subcategory_description"},
                 { text: "Action", value: "operation", width: 100 }
             ], 
+            
             id: '', 
             categoryId: '',        
             subcategoryName: '',
             subcategoryDescription: '',
             categoryIdError: '' ,
             subcategoryNameError:'',
-            submitBtn: 'Store'         
+            submitBtn: 'Store',       
+            category: []
         }
     },
     methods: {
@@ -37,7 +39,8 @@ export default {
                         this.$refs.dataTable.reload()
                     })
                     .catch(({response}) => {
-                        this.subcategoryNameError = response.data.errors.category_name[0]
+                        this.categoryIdError = response.data.errors.category_id[0]
+                        this.subcategoryNameError = response.data.errors.subcategory_name[0]
                     })
             }else{
                 let params:Object = {
@@ -52,8 +55,8 @@ export default {
                         this.$refs.dataTable.reload()
                     })
                     .catch(({response}) => {
-                        // console.log(response.data.errors.category_name[0])
-                        this.categoryNameError = response.data.errors.category_name[0]
+                        this.categoryIdError = response.data.errors.category_id[0]
+                        this.subcategoryNameError = response.data.errors.subcategory_name[0]
                     })
             }
         },
@@ -61,7 +64,7 @@ export default {
         onEdit(item:Object){
             this.submitBtn = 'Update'
             this.id = item.id
-            this.categoryId = item.id
+            this.categoryId = item.category_id
             this.subcategoryName = item.subcategory_name
             this.subcategoryDescription = item.subcategory_description
         },
@@ -84,11 +87,26 @@ export default {
         onRefresh(){
             this.id = ''
             this.categoryId = ''
+            this.categoryIdError = ''
             this.subcategoryName = ''
             this.subcategoryDescription = ''
+            this.subcategoryNameError = ''
             this.submitBtn = 'Store'
             this.$refs.dataTable.reload()
-        }
+        },
+
+        getCategory(){
+            this.axios.get('subcategory/category/list')
+                .then(({data}) => {
+                    this.category = data.data
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
+        }        
+    },
+    mounted(){
+        this.getCategory()
     }
 }
 </script>
@@ -114,28 +132,25 @@ export default {
                 <div class="card-body">
                     <form autocomplete="off" @submit="onSubmit">                        
                         <div class="row">
-                            <div class="col-3">
+                            <div class="col-2">
                                 <label class="form-label">Category Name <span class="required">(*)</span></label>
-                                <select class="form-select is-invalid" v-model="categoryId" :class="{'is-invalid': categoryIdError}">
+                                <select class="form-select" v-model="categoryId" :class="{'is-invalid': categoryIdError}">
                                     <option value="">Select Type</option>
+                                    <option v-for="item in category" :key="item.id" :value="item.id">{{ item.category_name }}</option>
                                 </select>
-                                <div class="invalid-feedback">
-                                    Test
-                                </div> 
+                                <div class="invalid-feedback">{{ categoryIdError }}</div> 
                             </div>    
                             <div class="col-3">
                                 <label class="form-label">Subcategory Name <span class="required">(*)</span></label>
                                <input type="text" class="form-control" :class="{'is-invalid': subcategoryNameError}" placeholder="Subcategory Name" v-model="subcategoryName">
-                               <div class="invalid-feedback">
-                                    {{ subcategoryNameError }}
-                                </div> 
+                               <div class="invalid-feedback">{{ subcategoryNameError }}</div> 
                             </div>                           
                             <div class="col-4 g-0">
                                 <label class="form-label">Subcategory Description </label>
                                 <input type="text" class="form-control" placeholder="Subcategory Description" v-model="subcategoryDescription">                                
                             </div>
-                            <div class="col-2" style="margin-top: 31px">
-                                <button type="submit" class="btn btn-primary btn-radius"><i class="fas fa-hdd"></i> Store Subcategory </button> &nbsp;
+                            <div class="col-3" style="margin-top: 31px">
+                                <button type="submit" class="btn btn-primary btn-radius"><i class="fas fa-hdd"></i> {{ submitBtn }} Subcategory </button> &nbsp;
                             </div>
                         </div>                    
                     </form>

@@ -70,7 +70,7 @@ export default {
               this.loading = false
           })
           .catch(function (error) {
-              console.error(error);
+              console.log(error);
           });
       },
       updateSort(val){
