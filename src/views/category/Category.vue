@@ -89,6 +89,7 @@ export default {
         onRefresh(){
             this.id = ''
             this.categoryName = ''
+            this.categoryNameError = ''
             this.categoryDescription = ''
             this.submitBtn = 'Store'
             this.$refs.dataTable.reload()
