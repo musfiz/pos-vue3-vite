@@ -148,7 +148,7 @@ export default {
                                 <label class="form-label">Subcategory Description </label>
                                 <input type="text" class="form-control" placeholder="Subcategory Description" v-model="subcategoryDescription">                                
                             </div>
-                            <div class="col-3 d-flex" style="margin-top: 31px">
+                            <div class="col-auto" style="margin-top: 31px">
                                 <button type="submit" class="btn btn-primary btn-radius"><i class="fas fa-hdd"></i> {{submitBtn}} Subcategory </button> &nbsp;
                                 <a class="btn btn-success btn-radius" title="Refresh" @click="onRefresh"><i class="fas fa-refresh"></i></a> &nbsp;
                             </div>
