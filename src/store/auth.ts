@@ -30,8 +30,10 @@ export const authStore = {
       //Removing token from cookie
       cookies.remove('isAuth')
       cookies.remove('isLayout')
-      cookies.remove('user');
-      cookies.remove('token');
+      cookies.remove('user')
+      cookies.remove('token')
+      cookies.remove('category')
+      cookies.remove('vendor');
     },
 
     updateLayout(state, payload){

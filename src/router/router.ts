@@ -5,6 +5,7 @@ import Vendor from '../views/vendor/Vendor.vue'
 import Variant from '../views/variant/Variant.vue'
 import Product from '../views/product/Product.vue'
 import ProductAdd from '../views/product/ProductAdd.vue'
+import ProductEdit from '../views/product/ProductEdit.vue'
 import Stock from '../views/stock/Stock.vue'
 import StockAdd from '../views/stock/StockAdd.vue'
 import SalesRegister from '../views/register/SalesRegister.vue'
@@ -21,6 +22,7 @@ const routes = [
   { path: "/variant", name: "variant.view", component: Variant },
   { path: "/product", name: "product.view", component: Product },
   { path: "/product/add", name: "product.add", component: ProductAdd },
+  { path: "/product/edit/:id", name: "product.edit", component: ProductEdit },
   { path: "/stock", name: "stock.view", component: Stock },
   { path: "/stock/add", name: "stock.add", component: StockAdd },
   { path: "/register/sales", name: "register.sales", component: SalesRegister },

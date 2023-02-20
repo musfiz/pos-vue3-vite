@@ -43,6 +43,7 @@
 </template>
 
 <script lang="ts">
+import { mapActions } from 'vuex';
 export default {
   data() {
     return {
@@ -54,13 +55,16 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['login','category', 'vendor']),
     handleSubmit(e) {
       e.preventDefault()
       this.axios.post('/login', this.user)
         .then(({data}) => {
           this.toast.success('<strong>'+ data.message +'</strong>', {autoClose: 2000})
-          setTimeout(() => {
-            this.$store.dispatch('login', data.data)
+          setTimeout(() => {            
+            this.login(data.data)
+            this.category()
+            this.vendor()
           }, 3000)          
         })
         .catch((error) => {

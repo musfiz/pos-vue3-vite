@@ -4,35 +4,48 @@ import axios from 'axios'
 
 export const commonStore = {
   state: ()=>({
-    category: [],
-    vendor: []
+    category: cookies.get('category') || [],
+    vendor: cookies.get('vendor') || []
   }),
 
   mutations:{
     SET_CATEGORY(state, payload){
+      cookies.set('category', JSON.stringify(payload))
       state.category = payload
     },
     SET_VENDOR(state, payload){
+      cookies.set('vendor', JSON.stringify(payload));
       state.vendor = payload
     }
   },
 
   actions: {
-    getAllcategory(context, payload){
-      
-      context.commit('SET_CATEGORY', payload)
+    category(context){
+      axios.get('common/category')
+        .then(({data}) => {
+          context.commit('SET_CATEGORY', data.data)
+        })
+        .catch((error) => {
+            console.log(error);
+        })
     },
-    getAllVendor(context, payload){
-
+    vendor(context){
+      axios.get('common/vendor')
+      .then(({data}) => {
+        context.commit('SET_VENDOR', data.data)
+      })
+      .catch((error) => {
+          console.log(error);
+      })
     }
   },  
 
   getters: {
     getCategory(state){
-      return state.category
+      return JSON.parse(state.category)
     },
     getVendor(state){
-      return state.vendor
+      return JSON.parse(state.vendor)
     }
   }
 }

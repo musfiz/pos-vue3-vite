@@ -41,6 +41,10 @@ export default {
           type: Boolean,
           required: false
       },
+      rows: {
+        type: Number,
+        required:false
+      }
   },  
   components: {easyDataTable},
   data(){
@@ -50,7 +54,7 @@ export default {
           serverItemsLength: 0,
           serverOptions : {
               page: 1,
-              rowsPerPage: 10,                
+              rowsPerPage: this.rows ? this.rows :  10,                
           },
           rowsItems: [10, 20, 40, 80, 100, 500],
           sortBy: 'id',
@@ -70,14 +74,14 @@ export default {
               this.loading = false
           })
           .catch(function (error) {
-              console.log(error);
+              console.log(error)
           });
       },
       updateSort(val){
-            if(this.sort){
-                this.sortBy = val.sortBy
-                this.sortType = val.sortType
-            }
+        if(this.sort){
+            this.sortBy = val.sortBy
+            this.sortType = val.sortType
+        }
       },
       reload(){
         this.getServerData()

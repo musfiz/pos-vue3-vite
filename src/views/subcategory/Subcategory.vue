@@ -1,5 +1,6 @@
 <script lang="ts">
 import DataTable from '../../components/global/DataTable.vue'
+import {mapGetters, mapState} from 'vuex'
 export default {
     components: {DataTable},
     data(){
@@ -18,11 +19,12 @@ export default {
             categoryIdError: '' ,
             subcategoryNameError:'',
             submitBtn: 'Store',       
-            category: []
-
+            category: this.getCategory()
         }
     },
     methods: {
+        ...mapGetters(['getCategory']),
+        
         onSubmit(e){
             e.preventDefault()
             
@@ -96,21 +98,8 @@ export default {
             this.categoryIdError = ''
             this.subcategoryNameError = ''
             this.$refs.dataTable.reload()
-        },
-
-        getAllCategory(){
-            this.axios.get('subcategory/category/list')
-                .then(({data}) => {
-                    this.category = data.data
-                })
-                .catch((error) => {
-                    console.log(error);
-                })
-        }        
+        }   
     },
-    mounted(){
-        this.getAllCategory()
-    }
 }
 </script>
 
