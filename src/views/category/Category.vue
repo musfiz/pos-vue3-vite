@@ -89,6 +89,7 @@ export default {
         onRefresh(){
             this.id = ''
             this.categoryName = ''
+            this.categoryNameError = ''
             this.categoryDescription = ''
             this.submitBtn = 'Store'
             this.$refs.dataTable.reload()
@@ -130,9 +131,9 @@ export default {
                                 <label class="form-label">Category Description </label>
                                 <input type="text" class="form-control" placeholder="Category Description" v-model="categoryDescription">
                             </div>
-                            <div class="col-auto d-flex" style="margin-top: 31px">
+                            <div class="col-auto" style="margin-top: 31px">
                                 <button type="submit" class="btn btn-primary btn-radius"><i class="fas fa-hdd"></i> {{ submitBtn }} Category </button> &nbsp;
-                                <a class="btn btn-success btn-radius" @click="onRefresh"><i class="fas fa-refresh"></i> Refresh </a> &nbsp;
+                                <a class="btn btn-success btn-radius" @click="onRefresh"><i class="fas fa-refresh"></i></a>
                             </div>
                         </div>                    
                     </form>

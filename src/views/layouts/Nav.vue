@@ -30,17 +30,6 @@ export default {
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="fas fa-layer-group"></i> Stock
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
-                  <li><router-link class="dropdown-item" :to="{name: 'stock.view'}"><i class="fas fa-layer-group"></i> View Stock</router-link></li>
-                  <li><router-link class="dropdown-item" to="/"><i class="fas fa-info-circle"></i> View Stock Details</router-link></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><router-link class="dropdown-item" to="/"><i class="fas fa-cubes"></i> Stock Adjust (Sales)</router-link></li>
-                </ul>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="fab fa-product-hunt"></i> Product
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
@@ -54,20 +43,31 @@ export default {
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="fas fa-cash-register"></i> Register
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
-                  <li><router-link class="dropdown-item" :to="{name: 'register.sales'}"><i class="fas fa-credit-card"></i> Sales Register</router-link></li>
-                  <li><router-link class="dropdown-item" :to="{name: 'register.purchase'}"><i class="fas fa-money-check-alt"></i> Purchase Register</router-link></li>
-                </ul>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="fas fa-users"></i> Client
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
                   <li><router-link class="dropdown-item" :to="{name: 'customer.view'}"><i class="fas fa-user-alt"></i> Customer List</router-link></li>
                   <li><router-link class="dropdown-item" :to="{name: 'supplier.view'}"><i class="fas fa-user-check"></i> Supplier List</router-link></li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fas fa-layer-group"></i> Stock
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
+                  <li><router-link class="dropdown-item" :to="{name: 'stock.view'}"><i class="fas fa-layer-group"></i> View Stock</router-link></li>
+                  <li><router-link class="dropdown-item" to="/"><i class="fas fa-info-circle"></i> View Stock Details</router-link></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><router-link class="dropdown-item" to="/"><i class="fas fa-cubes"></i> Stock Adjust (Sales)</router-link></li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fas fa-cash-register"></i> Register
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
+                  <li><router-link class="dropdown-item" :to="{name: 'register.sales'}"><i class="fas fa-credit-card"></i> Sales Register</router-link></li>
+                  <li><router-link class="dropdown-item" :to="{name: 'register.purchase'}"><i class="fas fa-money-check-alt"></i> Purchase Register</router-link></li>
                 </ul>
               </li>
               <li class="nav-item dropdown">
