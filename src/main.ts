@@ -51,6 +51,7 @@ app.use(router)
 app.use(store)
 app.use(VueAxios, axios)
 app.use(cookies, {expireTimes: '2d', secure: true, sameSite: "None"})
+
 app.mount('#app')
 
 import "bootstrap/dist/js/bootstrap.js"

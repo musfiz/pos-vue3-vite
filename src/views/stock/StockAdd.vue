@@ -1,3 +1,10 @@
+<script lang="ts">
+import Typeahead from 'vue3-simple-typeahead'
+import 'vue3-simple-typeahead/dist/vue3-simple-typeahead.css' //Optional default CSS
+export default {
+  components: { Typeahead },
+}
+</script>
 <template>
   <div>
     <!-- row -->
@@ -31,11 +38,23 @@
                                     <option value="Gang">Gang</option>
                                     <option value="Color">Color</option>
                                     <option value="Pin">Pin</option>
+                                    <option value="Weight">Weight</option>
+                                    <option value="Height">Height</option>
+                                    <option value="Piece">Piece</option>
+                                    <option value="Core">Core</option>
+                                    <option value="Hole">Hole</option>
                                 </select>
                             </div>                           
                             <div class="col">
                                 <label class="form-label">Type Product Name or Product Code <span class="required">(*)</span></label>
-                                <input type="text" class="form-control" placeholder="Type Anything" id="product_name">                                
+                                <!-- <input type="text" class="form-control" placeholder="Type Anything" id="product_name">-->
+                                <typeahead 
+                                  class="form-control"
+                                  id="typeahead_id"
+                                  placeholder="Type Anything..."
+                                  :items="['One','Two','Three']"
+                                  :minInputLength="1"                                
+                                ></typeahead>
                             </div>
                             <div class="col" style="margin-top: 31px">
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search </button> &nbsp;
