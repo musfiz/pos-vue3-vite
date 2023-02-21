@@ -40,6 +40,7 @@ export default {
                 this.axios.put('category/'+ this.id, params)
                     .then(({data}) => {
                         this.toast.info(data.message)
+                        this.$store.dispatch('category') //Load new created category to store & cookie
                         this.onRefresh()
                         this.$refs.dataTable.reload()
                     })
@@ -54,6 +55,7 @@ export default {
                 this.axios.post('category', params)
                     .then(({data}) => {
                         this.toast.success(data.message)
+                        this.$store.dispatch('category') //Load new edited category to store & cookie
                         this.onRefresh()
                         this.$refs.dataTable.reload()
                     })

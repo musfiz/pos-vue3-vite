@@ -5,9 +5,9 @@ export default {
     data(){
         return {
             headers: [
-                { text: "Category", value: "category_name"},
-                { text: "Subcategory", value: "subcategory_name"},
-                { text: "Vendor", value: "vendor_name"},
+                { text: "Category", value: "category.category_name"},
+                { text: "Subcategory", value: "subcategory.subcategory_name"},
+                { text: "Vendor", value: "vendor.vendor_name"},
                 { text: "Code", value: "code"},
                 { text: "Class Code", value: "class_code"},
                 { text: "Product Name", value: "product_name"},

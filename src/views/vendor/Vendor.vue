@@ -32,6 +32,7 @@ export default {
                 this.axios.put('vendor/'+ this.id, params)
                     .then(({data}) => {
                         this.toast.info(data.message)
+                        this.$store.dispatch('vendor')
                         this.onRefresh()
                         this.$refs.dataTable.reload()
                     })
@@ -46,6 +47,7 @@ export default {
                 this.axios.post('vendor', params)
                     .then(({data}) => {
                         this.toast.success(data.message)
+                        this.$store.dispatch('vendor')
                         this.onRefresh()
                         this.$refs.dataTable.reload()
                     })

@@ -10,13 +10,12 @@ export default {
         classCode:'',
         productName: '',
         categoryIdError: '',
-        subcategoryIdError: '',
+        subcategoryError: '',
         vendorIdError: '',
         productNameError: '',
         category: this.getCategory(),
         subcategory: [],
-        vendor: this.getVendor(),
-        isInvalid: false
+        vendor: this.getVendor()
     }
   },
     methods: {
@@ -26,11 +25,11 @@ export default {
             e.preventDefault()
             let params:Object = {
                 'category_id': this.categoryId,
-                'subcategory_id': this.selectedSubcategory,
+                'subcategory_id': this.selectedSubcategory.id,
                 'vendor_id': this.vendorId,
                 'code': this.code,
-                'classCode': this.classCode,
-                'productName': this.productName
+                'class_code': this.classCode,
+                'product_name': this.productName
             }
             this.axios.post('product', params)
                 .then(({data}) => {
@@ -39,11 +38,13 @@ export default {
                 })
                 .catch(({response}) => {
                     this.categoryIdError = response.data.errors.category_id ? response.data.errors.category_id[0] : ''
-                    this.subcategoryIdError = response.data.errors.subcategory_id ? response.data.errors.subcategory_id[0] :''
+                    this.subcategoryError = response.data.errors.subcategory_id ? response.data.errors.subcategory_id[0] :''
+                    this.vendorIdError = response.data.errors.vendor_id ? response.data.errors.vendor_id[0] :''
+                    this.productNameError = response.data.errors.product_name ? response.data.errors.product_name[0] :''
                 })
         },
 
-        onCategoryChange(){
+        onChangeCategory(){
             this.axios.get('common/subcategory/'+ this.categoryId)
                 .then(({data}) => {
                     this.subcategory = data.data
@@ -62,13 +63,14 @@ export default {
             this.classCode = ''
             this.productName = ''
             this.categoryIdError = ''
-            this.subcategoryIdError = ''
+            this.subcategoryError = ''
             this.vendorIdError = ''
             this.productNameError = ''
         }
     }
 }
 </script>
+
 <template>
   <div>
     <!-- row -->
@@ -92,24 +94,24 @@ export default {
                 <div class="row">
                   <div class="col-4">
                       <label class="form-label">Category <span class="required">(*)</span></label>
-                      <select class="form-select" v-model="categoryId" @change="onCategoryChange">
+                      <select class="form-select" :class="{'is-invalid': categoryIdError}" v-model="categoryId" @change="onChangeCategory">
                           <option value="">Select Category</option>
                           <option v-for="item in category" :key="item.id" :value="item.id">{{ item.category_name }}</option>
                       </select>
+                      <div class="invalid-feedback">{{ categoryIdError }}</div> 
                   </div>  
                   <div class="col-4">
-                        <label class="form-label">Subcategory <span class="required">(*)</span></label>
-                        
-                            <multiselect class="invalid" :value="selectedSubcategory" :options="subcategory" placeholder="Select subcategory" label="subcategory_name" :allow-empty="required"></multiselect>
-                            <label class="typo__label form__label" :v-show="isInvalid">Must have at least one value</label>
-                        
+                        <label class="form-label">Subcategory <span class="required">(*)</span></label>                        
+                        <multiselect v-model="selectedSubcategory" :class="{'invalid': subcategoryError}" :options="subcategory" placeholder="Select subcategory" label="subcategory_name"></multiselect>
+                        <span class="typo__label">{{ subcategoryError }}</span>                        
                   </div>  
                   <div class="col-4">
                       <label class="form-label">Vendor <span class="required">(*)</span></label>
-                      <select class="form-select" v-model="vendorId">
+                      <select class="form-select" :class="{'is-invalid': vendorIdError}" v-model="vendorId">
                           <option value="">Select Vendor</option>
                           <option v-for="item in vendor" :key="item.id" :value="item.id">{{ item.vendor_name }}</option>
                       </select>
+                      <div class="invalid-feedback">{{ vendorIdError }}</div> 
                   </div>    
                 </div>                        
                 <div class="row mt-3">
@@ -123,7 +125,8 @@ export default {
                   </div>    
                   <div class="col">
                     <label class="form-label">Product Name <span class="required">(*)</span></label>
-                    <input type="text" class="form-control" placeholder="Product Name" v-model="productName">
+                    <input type="text" class="form-control" :class="{'is-invalid': productNameError}"  placeholder="Product Name" v-model="productName">
+                    <div class="invalid-feedback">{{ productNameError }}</div> 
                   </div>                           
                 </div>                    
                 <div class="row mt-3">

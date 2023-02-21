@@ -35,7 +35,7 @@ import 'sweetalert2/dist/sweetalert2.min.css'
 const app = createApp(App)
 
 app.use(Vue3Toastify, {
-  autoClose: 3000,
+  autoClose: 2000,
   theme: 'colored',
   dangerouslyHTMLString: true,
   multiple: false

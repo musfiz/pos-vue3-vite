@@ -11,11 +11,11 @@ export const commonStore = {
   mutations:{
     SET_CATEGORY(state, payload){
       cookies.set('category', JSON.stringify(payload))
-      state.category = payload
+      state.category = JSON.stringify(payload)
     },
     SET_VENDOR(state, payload){
       cookies.set('vendor', JSON.stringify(payload));
-      state.vendor = payload
+      state.vendor = JSON.stringify(payload)
     }
   },
 
