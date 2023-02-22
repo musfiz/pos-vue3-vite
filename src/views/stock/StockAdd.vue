@@ -3,6 +3,70 @@ import Typeahead from 'vue3-simple-typeahead'
 import 'vue3-simple-typeahead/dist/vue3-simple-typeahead.css' //Optional default CSS
 export default {
   components: { Typeahead },
+  data(){
+    return {
+      productStock: [],
+      productId: '',
+      productName: '',
+      variantType: '',
+      variantTypeError: '',
+      selectedProductError: '',
+      products: [],
+    }
+  },
+  methods: {
+    projectedItem(item){
+      return item.name +' ('+ item.code +')'
+    },
+    onSelectedItem(item){
+      this.productId = item.id
+      this.productName = item.name
+    },
+    onInput(item){
+      const params = {
+        'query': item.input
+      }
+      this.axios.get('common/product/search', { params })
+        .then(({data}) => {
+          this.products = data.data
+        })
+        .catch(({response}) => {
+          console.log(response);                
+        })
+    },
+    onSubmit(e){
+      e.preventDefault()
+      const params = {
+        'variant_type': this.variantType,
+        'product_id': this.productId,
+        'product_name': this.productName
+      }
+      this.$router.replace({name: 'stock.add', query: params})
+      this.onShowProductDetails()
+    },
+    onShowProductDetails(){
+
+    },
+    stockEntry(){
+
+    },
+    onRefresh(){
+      this.$router.replace({name: 'stock.add'})
+      this.variantType = ''
+      this.productId = ''
+      this.productName = ''
+      this.products = []
+      this.$refs.inputRef.clearInput()
+      
+    }
+  },
+  mounted(){
+    if(this.$route.query.variant_type && this.$route.query.product_id){
+      this.variantType = this.$route.query.variant_type
+      this.productId = this.$route.query.product_id
+      this.$refs.inputRef.input = this.$route.query.product_name
+    }
+  }
 }
 </script>
 <template>
@@ -25,11 +89,11 @@ export default {
         <div class="col">
             <div class="card">
                 <div class="card-body">
-                    <form action="" autocomplete="off">                        
+                    <form autocomplete="off" @submit="onSubmit">                        
                         <div class="row"> 
                              <div class="col-2">
                                 <label class="form-label">Variant Type <span class="required">(*)</span></label>
-                                <select id="variant_type" class="form-select" name="variant_type">
+                                <select id="variant_type" class="form-select" v-model="variantType">
                                     <option value="">Select Type</option>
                                     <option value="Watt">Watt</option>
                                     <option value="Inch">Inch</option>
@@ -47,18 +111,22 @@ export default {
                             </div>                           
                             <div class="col">
                                 <label class="form-label">Type Product Name or Product Code <span class="required">(*)</span></label>
-                                <!-- <input type="text" class="form-control" placeholder="Type Anything" id="product_name">-->
                                 <typeahead 
                                   class="form-control"
-                                  id="typeahead_id"
+                                  :class="{'is-invalid': selectedProductError}"
+                                  ref="inputRef"
                                   placeholder="Type Anything..."
-                                  :items="['One','Two','Three']"
-                                  :minInputLength="1"                                
+                                  :items="products"
+                                  :minInputLength="1" 
+                                  :itemProjection="projectedItem"
+                                  @selectItem="onSelectedItem"    
+                                  @onInput="onInput"                                       
                                 ></typeahead>
+                                <div class="custom-invalid-feedback">{{selectedProductError}}</div> 
                             </div>
                             <div class="col" style="margin-top: 31px">
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search </button> &nbsp;
-                                <button class="btn btn-warning text-white ml-2" :to="{name: 'stock.view'}"><i class="fa fa-sync-alt"></i> Refresh </button>
+                                <a class="btn btn-warning text-white ml-2" @click="onRefresh"><i class="fa fa-sync-alt"></i></a>
                             </div>
                         </div>                    
                     </form>
@@ -87,32 +155,23 @@ export default {
                   </thead>
                   <tbody>
                     <tr>
-                        <td>1</td>
+                        <!-- <td>1</td>
                         <td>Product 1</td>
                         <td><input type="hidden" name="variant_id[]" value="">5w</td>
                         <td><input type="text" class="form-control form-control-sm" dir="rtl" name="dp_price[]" autofocus ></td>
                         <td><input type="text" class="form-control form-control-sm" dir="rtl" name="tp_price[]"></td>
                         <td><input type="text" class="form-control form-control-sm" dir="rtl" name="price[]"></td>
-                        <td><input type="text" class="form-control form-control-sm" dir="rtl" name="quantity[]"></td>                                    
+                        <td><input type="text" class="form-control form-control-sm" dir="rtl" name="quantity[]"></td>                                     -->
                     </tr>
                   </tbody>
               </table>
-              <div class="d-grid">
+              <div class="d-grid" v-if="productStock.length > 0">
                 <button type="submit" class="btn btn-success btn-block btn-flat"><i class="fas fa-hdd"></i> Store Stock</button>
               </div>
            </div>
         </div>
       </div>
     </div>
-    <!-- row -->
-
-    <!-- row -->
-    <div class="row mt-2">
-      <div class="col">
-        
-       
-      </div>
-    </div>   
     <!-- row -->
   </div>
 </template>

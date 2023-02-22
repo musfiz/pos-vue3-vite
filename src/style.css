@@ -106,3 +106,8 @@ body {
 .invalid-feedback{
   font-size: 0.8rem
 }
+
+.custom-invalid-feedback{
+  font-size: 0.8rem;
+  color: #dc3545
+}
