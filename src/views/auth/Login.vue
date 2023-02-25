@@ -55,7 +55,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['login','category', 'vendor']),
+    ...mapActions(['login']),
     handleSubmit(e) {
       e.preventDefault()
       this.axios.post('/login', this.user)
@@ -63,8 +63,6 @@ export default {
           this.toast.success('<strong>'+ data.message +'</strong>', {autoClose: 2000})
           setTimeout(() => {            
             this.login(data.data)
-            this.category()
-            this.vendor()
           }, 3000)          
         })
         .catch(({response}) => {

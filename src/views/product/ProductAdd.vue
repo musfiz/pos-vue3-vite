@@ -9,12 +9,15 @@ export default {
         code:'',
         classCode:'',
         productName: '',
+        selectedVariant: [],
         categoryIdError: '',
         subcategoryError: '',
         vendorIdError: '',
         productNameError: '',
+        variantError: '',
         category: this.getCategory(),
         subcategory: [],
+        variant: [],
         vendor: this.getVendor()
     }
   },
@@ -29,7 +32,8 @@ export default {
                 'vendor_id': this.vendorId,
                 'code': this.code,
                 'class_code': this.classCode,
-                'product_name': this.productName
+                'product_name': this.productName,
+                'product_variant': this.selectedSubcategory
             }
             this.axios.post('product', params)
                 .then(({data}) => {
@@ -54,6 +58,21 @@ export default {
                 })
         },
 
+        getVariant(){
+          this.axios.get('common/variant/')
+            .then(({data}) => {
+                this.variant = data.data
+            })
+            .catch((error) => {
+                console.log(error);                    
+            })
+        },
+
+        removeVariant(item){  
+          const index = this.selectedVariant.findIndex(obj => obj.id === item.id)
+          this.selectedVariant.splice(index, 1)
+        },
+
         onRefresh(){
             this.categoryId = ''
             this.selectedSubcategory = ''
@@ -61,11 +80,16 @@ export default {
             this.code = ''
             this.classCode = ''
             this.productName = ''
+            this.selectedVariant = []
             this.categoryIdError = ''
             this.subcategoryError = ''
             this.vendorIdError = ''
             this.productNameError = ''
+            this.variantError = ''
         }
+    },
+    mounted(){
+      this.getVariant()
     }
 }
 </script>
@@ -121,13 +145,30 @@ export default {
                   <div class="col-2">
                     <label class="form-label"> Class Code </label>
                     <input type="text" class="form-control" placeholder="Class Code" v-model="classCode">
-                  </div>    
+                  </div>  
                   <div class="col">
                     <label class="form-label">Product Name <span class="required">(*)</span></label>
                     <input type="text" class="form-control" :class="{'is-invalid': productNameError}"  placeholder="Product Name" v-model="productName">
                     <div class="invalid-feedback">{{ productNameError }}</div> 
                   </div>                           
-                </div>                    
+                </div>    
+
+                <div class="row mt-3">
+                  <div class="col-4">
+                    <label class="form-label"> Variant <span class="required">(*)</span></label>                        
+                    <multiselect v-model="selectedVariant" 
+                        :class="{'invalid': variantError}" 
+                        :options="variant" 
+                        placeholder="Select Variant" 
+                        label="variant_name" 
+                        :multiple="true" 
+                        @remove="removeVariant"
+                    >
+                    </multiselect>
+                    <span class="typo__label">{{ variantError }}</span>                        
+                  </div> 
+                </div>  
+                               
                 <div class="row mt-3">
                   <div class="col-6 d-grid">
                     <button type="submit" class="btn btn-primary btn-block btn-radius"><i class="fas fa-hdd"></i> Store Product</button>

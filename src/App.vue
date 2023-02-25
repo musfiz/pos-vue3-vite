@@ -1,7 +1,7 @@
 <script lang="ts">
 import Login from './views/auth/Login.vue'
 import Index from './views/layouts/Index.vue'
-
+import { mapActions } from 'vuex';
 export default {
   components: {Login, Index},
   computed: {
@@ -9,6 +9,15 @@ export default {
       return this.$store.getters.isLayout
     }    
   },
+  methods: {
+    ...mapActions(['category', 'vendor']),
+  },
+  mounted(){
+    if(this.layout == 'Index'){
+      this.category()
+      this.vendor()
+    }
+  }
 }
 </script>
 
