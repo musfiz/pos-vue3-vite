@@ -67,8 +67,8 @@ export default {
             this.vendor()
           }, 3000)          
         })
-        .catch((error) => {
-          this.toast.error('<strong>Something went wrong !</strong>')
+        .catch(({response}) => {
+          this.toast.error('<strong>'+response.data.message+'</strong>')
         });
     }
   },

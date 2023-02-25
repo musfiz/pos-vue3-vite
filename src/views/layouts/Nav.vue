@@ -67,7 +67,10 @@ export default {
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
                   <li><router-link class="dropdown-item" :to="{name: 'register.sales'}"><i class="fas fa-credit-card"></i> Sales Register</router-link></li>
+                  <li><router-link class="dropdown-item" :to="{name: 'register.sales'}"><i class="fas fa-redo"></i> Sales Return</router-link></li>
+                  <li><hr class="dropdown-divider"></li>
                   <li><router-link class="dropdown-item" :to="{name: 'register.purchase'}"><i class="fas fa-money-check-alt"></i> Purchase Register</router-link></li>
+                  <li><router-link class="dropdown-item" :to="{name: 'register.purchase'}"><i class="fas fa-store-slash"></i> Purchase Return</router-link></li>
                 </ul>
               </li>
               <li class="nav-item dropdown">
