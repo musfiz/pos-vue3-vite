@@ -33,8 +33,9 @@ export default {
                 'code': this.code,
                 'class_code': this.classCode,
                 'product_name': this.productName,
-                'product_variant': this.selectedSubcategory
+                'variant_id': this.selectedVariant.map(obj => obj.id)
             }
+            
             this.axios.post('product', params)
                 .then(({data}) => {
                     this.toast.success(data.message)
@@ -45,6 +46,7 @@ export default {
                     this.subcategoryError = response.data.errors.subcategory_id ? response.data.errors.subcategory_id[0] :''
                     this.vendorIdError = response.data.errors.vendor_id ? response.data.errors.vendor_id[0] :''
                     this.productNameError = response.data.errors.product_name ? response.data.errors.product_name[0] :''
+                    this.variantError = response.data.errors.variant_id ? response.data.errors.variant_id[0] :''
                 })
         },
 
@@ -66,11 +68,6 @@ export default {
             .catch((error) => {
                 console.log(error);                    
             })
-        },
-
-        removeVariant(item){  
-          const index = this.selectedVariant.findIndex(obj => obj.id === item.id)
-          this.selectedVariant.splice(index, 1)
         },
 
         onRefresh(){
@@ -156,13 +153,15 @@ export default {
                 <div class="row mt-3">
                   <div class="col-4">
                     <label class="form-label"> Variant <span class="required">(*)</span></label>                        
-                    <multiselect v-model="selectedVariant" 
+                    <multiselect 
+                        track-by="id"
+                        v-model="selectedVariant" 
                         :class="{'invalid': variantError}" 
                         :options="variant" 
                         placeholder="Select Variant" 
                         label="variant_name" 
                         :multiple="true" 
-                        @remove="removeVariant"
+                        :close-on-select="true"
                     >
                     </multiselect>
                     <span class="typo__label">{{ variantError }}</span>                        

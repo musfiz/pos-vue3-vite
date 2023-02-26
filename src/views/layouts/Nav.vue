@@ -35,8 +35,10 @@ export default {
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
                   <li><router-link class="dropdown-item" :to="{name: 'category.view'}"><i class="fas fa-plus-circle"></i> Category</router-link></li>
                   <li><router-link class="dropdown-item" :to="{name: 'subcategory.view'}"><i class="fas fa-plus-circle"></i> Subcategory</router-link></li>
-                  <li><router-link class="dropdown-item" :to="{name: 'vendor.view'}"><i class="fas fa-plus-circle"></i> Product Vendor</router-link></li>
-                  <li><router-link class="dropdown-item" :to="{name: 'variant.view'}"><i class="fas fa-stream"></i> Product Variant</router-link></li>
+                  <li><router-link class="dropdown-item" :to="{name: 'vendor.view'}"><i class="fas fa-plus-circle"></i> Vendor</router-link></li>
+                  <li><router-link class="dropdown-item" :to="{name: 'variant.view'}"><i class="fas fa-stream"></i> Variant</router-link></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><router-link class="dropdown-item" :to="{name: 'product.view'}"><i class="fas fa-list"></i> Product Variant</router-link></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><router-link class="dropdown-item" :to="{name: 'product.view'}"><i class="fas fa-list"></i> Product List</router-link></li>
                 </ul>

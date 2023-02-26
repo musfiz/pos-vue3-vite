@@ -95,7 +95,7 @@ export default {
         <div class="col">
             <div class="card border-secondary">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5><i class="fa fa-list"></i> Product Variant</h5>
+                    <h5><i class="fa fa-list"></i> Variant</h5>
                 </div>
             </div>
         </div>
