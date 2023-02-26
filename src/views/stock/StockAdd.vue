@@ -5,13 +5,11 @@ export default {
   components: { Typeahead },
   data(){
     return {
-      productStock: [],
+      products: [],
       productId: '',
       productName: '',
-      variantType: '',
-      variantTypeError: '',
-      selectedProductError: '',
-      products: [],
+      productVariant: [],
+      productVariantIds: [],
     }
   },
   methods: {
@@ -21,6 +19,7 @@ export default {
     onSelectedItem(item){
       this.productId = item.id
       this.productName = item.name
+      this.productVariantIds = item.product_variant.map(obj => obj.id)
     },
     onInput(item){
       const params = {
@@ -36,34 +35,58 @@ export default {
     },
     onSubmit(e){
       e.preventDefault()
-      const params = {
-        'variant_type': this.variantType,
-        'product_id': this.productId,
-        'product_name': this.productName
+      if(!this.productId){
+        this.toast.error('<strong> Select a product for creating stock.</strong>')
+      }else{
+        const params = {
+          'product_id': this.productId,
+          'product_name': this.productName,
+          'variant_ids': this.productVariantIds
+        }
+        this.$router.replace({name: 'stock.add', query: params})
+        this.onGenerateForm()
       }
-      this.$router.replace({name: 'stock.add', query: params})
-      this.onShowProductDetails()
     },
-    onShowProductDetails(){
 
+    onGenerateForm(){
+      this.axios.post('common/stock/check', this.productVariantIds)
+        .then(({data}) => {
+          this.productVariant = data.data
+        })
+        .catch(({response}) => {
+          console.log(response);   
+        })
     },
-    stockEntry(){
-
+    
+    createStock(e){
+      e.preventDefault()
+      let params = {
+        'variant': this.productVariant
+      }
+      this.axios.post('stock', params)
+        .then(({data}) => {
+          
+        })
+        .catch(({response}) => {
+          console.log(response);   
+        })
     },
     onRefresh(){
       this.$router.replace({name: 'stock.add'})
-      this.variantType = ''
       this.productId = ''
       this.productName = ''
       this.products = []
+      this.productVariant = []
+      this.productVariantIds = []
       this.$refs.inputRef.clearInput()
       
     }
   },
   mounted(){
-    if(this.$route.query.variant_type && this.$route.query.product_id){
-      this.variantType = this.$route.query.variant_type
+    if(this.$route.query.product_id){
       this.productId = this.$route.query.product_id
+      this.productName = this.$route.query.product_name
+      this.productVariantIds = this.$route.query.variant_ids
       this.$refs.inputRef.input = this.$route.query.product_name
     }
   }
@@ -90,30 +113,11 @@ export default {
             <div class="card">
                 <div class="card-body">
                     <form autocomplete="off" @submit="onSubmit">                        
-                        <div class="row"> 
-                             <div class="col-2">
-                                <label class="form-label">Variant Type <span class="required">(*)</span></label>
-                                <select id="variant_type" class="form-select" v-model="variantType">
-                                    <option value="">Select Type</option>
-                                    <option value="Watt">Watt</option>
-                                    <option value="Inch">Inch</option>
-                                    <option value="Size">Size</option>                                    
-                                    <option value="Meterail">Meterail</option>
-                                    <option value="Gang">Gang</option>
-                                    <option value="Color">Color</option>
-                                    <option value="Pin">Pin</option>
-                                    <option value="Weight">Weight</option>
-                                    <option value="Height">Height</option>
-                                    <option value="Piece">Piece</option>
-                                    <option value="Core">Core</option>
-                                    <option value="Hole">Hole</option>
-                                </select>
-                            </div>                           
+                        <div class="row">                       
                             <div class="col">
                                 <label class="form-label">Type Product Name or Product Code <span class="required">(*)</span></label>
                                 <typeahead 
                                   class="form-control"
-                                  :class="{'is-invalid': selectedProductError}"
                                   ref="inputRef"
                                   placeholder="Type Anything..."
                                   :items="products"
@@ -122,10 +126,10 @@ export default {
                                   @selectItem="onSelectedItem"    
                                   @onInput="onInput"                                       
                                 ></typeahead>
-                                <div class="custom-invalid-feedback">{{selectedProductError}}</div> 
+                                <!-- <div class="custom-invalid-feedback">{{selectedProductError}}</div>  -->
                             </div>
                             <div class="col" style="margin-top: 31px">
-                                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search </button> &nbsp;
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-list"></i> Generate Stock Form</button> &nbsp;
                                 <a class="btn btn-warning text-white ml-2" @click="onRefresh"><i class="fa fa-sync-alt"></i></a>
                             </div>
                         </div>                    
@@ -154,20 +158,20 @@ export default {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                        <!-- <td>1</td>
-                        <td>Product 1</td>
-                        <td><input type="hidden" name="variant_id[]" value="">5w</td>
-                        <td><input type="text" class="form-control form-control-sm" dir="rtl" name="dp_price[]" autofocus ></td>
-                        <td><input type="text" class="form-control form-control-sm" dir="rtl" name="tp_price[]"></td>
-                        <td><input type="text" class="form-control form-control-sm" dir="rtl" name="price[]"></td>
-                        <td><input type="text" class="form-control form-control-sm" dir="rtl" name="quantity[]"></td>                                     -->
+                    <tr v-show="productVariant.length > 0" v-for="(item, index) in productVariant" :key="item.id">
+                        <td>{{ index+1 }}</td>
+                        <td>{{ productName }}</td>
+                        <td><input type="hidden">{{ item.variant_name }}</td>
+                        <td><input type="text" class="form-control form-control-sm" dir="rtl" v-model="item.dpPrice" autofocus required></td>
+                        <td><input type="text" class="form-control form-control-sm" dir="rtl" v-model="item.tpPrice"></td>
+                        <td><input type="text" class="form-control form-control-sm" dir="rtl" v-model="item.price"></td>
+                        <td><input type="text" class="form-control form-control-sm" dir="rtl" v-model="item.quantity"></td>                                    
                     </tr>
                   </tbody>
               </table>
-              <div class="d-grid" v-if="productStock.length > 0">
-                <button type="submit" class="btn btn-success btn-block btn-flat"><i class="fas fa-hdd"></i> Store Stock</button>
-              </div>
+              <div class="d-grid" v-if="productVariant.length > 0">
+                <button type="submit" class="btn btn-success btn-block btn-flat" @click="createStock"><i class="fas fa-hdd"></i> Store Stock</button>
+              </div>          
            </div>
         </div>
       </div>
