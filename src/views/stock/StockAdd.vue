@@ -51,7 +51,12 @@ export default {
     onGenerateForm(){
       this.axios.post('common/stock/check', this.productVariantIds)
         .then(({data}) => {
-          this.productVariant = data.data
+          if(data.data.length > 0){
+            this.productVariant = data.data
+          }else{
+            this.toast.info('<strong>Stock already added for these product.</strong>')
+            this.onRefresh()
+          }
         })
         .catch(({response}) => {
           console.log(response);   
@@ -65,7 +70,8 @@ export default {
       }
       this.axios.post('stock', params)
         .then(({data}) => {
-          
+          this.toast.success(data.message)
+          this.onRefresh()
         })
         .catch(({response}) => {
           console.log(response);   
