@@ -185,10 +185,10 @@ export default {
                 </div>                     
                 <div class="row mt-3">
                   <div class="col-6 d-grid">
-                    <button type="submit" class="btn btn-primary btn-block btn-radius"><i class="fas fa-hdd"></i> Update Product</button>
+                    <button type="submit" class="btn btn-primary btn-block btn-flat"><i class="fas fa-hdd"></i> Update Product</button>
                   </div>
                   <!-- <div class="col-2 d-grid">
-                    <a class="btn btn-success btn-radius" title="Refresh" @click="onRefresh"><i class="fas fa-refresh"></i></a>
+                    <a class="btn btn-success btn-flat" title="Refresh" @click="onRefresh"><i class="fas fa-refresh"></i></a>
                   </div> -->
                 </div>
               </form>

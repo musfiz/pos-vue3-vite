@@ -137,8 +137,8 @@ export default {
                                 </div> 
                             </div>                           
                             <div class="col-3" style="margin-top: 31px">
-                                <button type="submit" class="btn btn-primary btn-radius"><i class="fas fa-hdd"></i> {{ submitBtn }} Variant </button> &nbsp;
-                                <a class="btn btn-success btn-radius" title="Refresh" @click="onRefresh"><i class="fas fa-refresh"></i></a> 
+                                <button type="submit" class="btn btn-primary btn-flat"><i class="fas fa-hdd"></i> {{ submitBtn }} Variant </button> &nbsp;
+                                <a class="btn btn-success btn-flat" title="Refresh" @click="onRefresh"><i class="fas fa-refresh"></i></a> 
                             </div>
                         </div>                    
                     </form>

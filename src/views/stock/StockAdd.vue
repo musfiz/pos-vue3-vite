@@ -84,8 +84,7 @@ export default {
       this.products = []
       this.productVariant = []
       this.productVariantIds = []
-      this.$refs.inputRef.clearInput()
-      
+      this.$refs.inputRef.clearInput()      
     }
   },
   mounted(){

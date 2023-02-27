@@ -134,8 +134,8 @@ export default {
                                 <input type="text" class="form-control" placeholder="Category Description" v-model="categoryDescription">
                             </div>
                             <div class="col-auto" style="margin-top: 31px">
-                                <button type="submit" class="btn btn-primary btn-radius"><i class="fas fa-hdd"></i> {{ submitBtn }} Category </button> &nbsp;
-                                <a class="btn btn-success btn-radius" @click="onRefresh"><i class="fas fa-refresh"></i></a>
+                                <button type="submit" class="btn btn-primary btn-flat"><i class="fas fa-hdd"></i> {{ submitBtn }} Category </button> &nbsp;
+                                <a class="btn btn-success btn-flat" @click="onRefresh"><i class="fas fa-refresh"></i></a>
                             </div>
                         </div>                    
                     </form>

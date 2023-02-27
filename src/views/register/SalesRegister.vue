@@ -46,13 +46,13 @@
                             </div>
                         </div>
                         <div class="col-3 g-0">
-                            <button href="javascript:void(0)" class="btn btn-success btn-sm btn-radius me-1">
+                            <button href="javascript:void(0)" class="btn btn-success btn-sm btn-flat me-1">
                                 <i class="fas fa-search"></i> Search </button>
-                            <a href="http://127.0.0.1:8000/sales/add" class="btn btn-warning text-white btn-sm btn-radius">
+                            <a href="http://127.0.0.1:8000/sales/add" class="btn btn-warning text-white btn-sm btn-flat">
                                 <i class="fa fa-sync-alt"></i> Refresh </a>
                         </div>
                         <div class="col-5 d-flex justify-content-end">                               
-                            <router-link target="_blank" class="btn btn-secondary btn-sm btn-radius me-1" :to="{name: 'register.sales'}"><i class="fas fa-hand-back-fist"></i> Hold</router-link>
+                            <router-link target="_blank" class="btn btn-secondary btn-sm btn-flat me-1" :to="{name: 'register.sales'}"><i class="fas fa-hand-back-fist"></i> Hold</router-link>
                         </div>
                     </div>
                     <div class="row g-1">
@@ -190,7 +190,7 @@
                 </div>
             </div>             
             <div class="col d-grid" style="margin-top:0.5rem;"> 
-                <button class="btn btn-success btn-radius" :disabled="completeBtnDisable"  v-html="completeButton"></button>  
+                <button class="btn btn-success btn-flat" :disabled="completeBtnDisable"  v-html="completeButton"></button>  
             </div>   
         </div>		
     </div>

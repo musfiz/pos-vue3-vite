@@ -144,10 +144,10 @@ export default {
                               <textarea class="form-control" rows="2" v-model="address" placeholder="Address"></textarea>
                             </div>
                             <div class="col-2 mt-2 d-grid">
-                                <button type="submit" class="btn btn-primary btn-radius"><i class="fas fa-hdd"></i> {{ submitBtn }} Supplier </button>
+                                <button type="submit" class="btn btn-primary btn-flat"><i class="fas fa-hdd"></i> {{ submitBtn }} Supplier </button>
                             </div>
                             <div class="col-1 mt-2 g-0">
-                                <a class="btn btn-success btn-radius" title="Refresh" @click="onRefresh"><i class="fas fa-refresh"></i></a>
+                                <a class="btn btn-success btn-flat" title="Refresh" @click="onRefresh"><i class="fas fa-refresh"></i></a>
                             </div>
                         </div>                    
                     </form>
