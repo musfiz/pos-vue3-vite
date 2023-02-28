@@ -1,22 +1,124 @@
 <script lang="ts">
-	export default {
-		data(){
-			return{
-				isNewInvoice: true,
-                products: [],
-                discount: '',
-                paymentTotal: '',
-                acceptTotal: 0,
-                refundTotal: '',
-                printAfterSale: '',
-                isPrintInvoice: true,
-                isDownloadPdf: false,                
-                completeButton: '<i class="fas fa-check"></i> Complete',
-                completeBtnDisable: false,
-                invoiceNo: '',
-			}
-		}
-	}
+import Typeahead from 'vue3-simple-typeahead'
+import 'vue3-simple-typeahead/dist/vue3-simple-typeahead.css' //Optional default CSS
+export default {
+    components: { Typeahead },
+    data(){
+        return{
+            isNewInvoice: true,
+            isPrintInvoice: true,
+            isDownloadPdf: false,      
+            invoiceNo: '',
+            products: [],
+            variants: [],
+            salesList: [], //Sales product list
+            productId: '',
+            productVariantId: '',
+            productName: '',
+            //
+            discount: '',
+            paymentTotal: '',
+            acceptTotal: 0,
+            refundTotal: '',
+            //
+            printAfterSale: '',                     
+            completeButton: '<i class="fas fa-check"></i> Complete',
+            completeBtnDisable: false,
+            customer: {
+                name: '',
+                mobileNo: '',
+                address: ''
+            },
+            error:{
+                customerNameError: '',
+                customerMobileError: ''
+            },
+            isCustomer: false
+        }
+    },
+    methods:{
+        projectedItem(item){
+            return item.name +' ('+ item.code +')'
+        },
+
+        onSelectedItem(item){
+            this.productId = item.id
+            this.productName = item.name
+            if(this.productId){
+                this.loadVariant(this.productId)
+            }
+        },
+
+        onInput(item){
+            const params = {
+                'query': item.input
+            }
+            this.axios.get('common/product/search', { params })
+                .then(({data}) => {
+                    this.products = data.data
+                })
+                .catch(({response}) => {
+                    console.log(response);                
+                })
+        },
+
+        loadVariant(productId){
+            this.axios.get('common/product/variant', { params:{product_id: productId}})
+                .then(({data}) => {
+                    const variants = data.data
+                    variants.forEach((item) => {
+                        const obj = {
+                            'product_variant_id': item.id,
+                            'variant_name': item.variant.variant_name
+                        }
+                        this.variants.push(obj)
+                    })
+                })
+                .catch(({response}) => {
+                    console.log(response);                
+                })
+        },
+
+        addProductToInvoice(){
+            if (!this.productId){
+                this.toast.error('Product not found !')
+            } else if (!this.productVariantId){
+                this.toast.error('Please select a product variant !')
+            } else {
+                this.axios.get('stock/product/variant/'+ this.productVariantId)
+                .then(({data}) => {
+                    const check = this.salesList.find(obj => obj.id == data.data.id)
+                    if(check){
+                        this.toast.info('Product already added to sales list.')
+                    }else{
+                        
+                    }
+                })
+                .catch(({response}) => {
+                    console.log(response);                
+                })
+            }
+        },
+
+        storeCustomer(){
+
+        },
+
+        onClear(){
+            this.productId = ''
+            this.productName = ''
+            this.productVariantId = ''
+            this.$refs.inputRef.clearInput()      
+        },
+
+        onRefresh(){
+
+        }
+    },
+    mounted(){
+        //
+    }
+}
 </script>
 
 <template>
@@ -26,9 +128,7 @@
         <div class="col">
             <div class="card bg-secondary text-white">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5>
-                        <i class="fas fa-shopping-cart"></i> Sales Register
-                    </h5>
+                    <h5><i class="fas fa-shopping-cart"></i> Sales Register</h5>
                 </div>
             </div>
         </div>
@@ -56,20 +156,30 @@
                         </div>
                     </div>
                     <div class="row g-1">
-                        <div class="col-2">
+                        <!-- <div class="col-2">
                             <input type="text" id="productCode" placeholder="Product Code" class="form-control form-control-sm">
+                        </div> -->
+                        <div class="col-6">
+                            <typeahead 
+                                class="form-control form-control-sm"
+                                ref="inputRef"
+                                placeholder="Type product name or code ..."
+                                :items="products"
+                                :minInputLength="1" 
+                                :itemProjection="projectedItem"
+                                @selectItem="onSelectedItem"    
+                                @onInput="onInput"                                       
+                            ></typeahead>
                         </div>
-                        <div class="col-5">
-                            <input type="text" id="productName" data-id="" placeholder="Product Name" autocomplete="off" class="form-control form-control-sm">
-                        </div>
-                        <div class="col-2">
-                            <select id="variant" class="form-select form-select-sm">
-                                <option value="">-- Variant --</option>
+                        <div class="col-3">
+                            <select id="variant" class="form-select form-select-sm" v-model="productVariantId">
+                                <option value="">-- Select Variant --</option>
+                                <option v-for="item in variants" :key="item.id" :value="item.product_variant_id" >{{ item.variant_name }}</option>
                             </select>
                         </div>
                         <div class="col">
-                            <a href="javascript:void(0)" class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus-circle"></i> Add </a>
+                            <a href="javascript:void(0)" class="btn btn-primary btn-sm" @click="addProductToInvoice">
+                                <i class="fas fa-plus-circle"></i> Add Product</a>
                             <a href="javascript:void(0)" class="btn btn-danger btn-sm ms-1">
                                 <i class="fa fa-sync-alt"></i> Clear </a>
                         </div>
@@ -103,15 +213,15 @@
                             <input type="text" class="form-control form-control-sm" placeholder="Search Customer">
                         </div>
                         <div class="col-4">
-                            <a id="searchCustomerButton" href="javascript:void(0)" class="btn btn-primary btn-block btn-sm"><i class="fas fa-search"></i> Search </a>
+                            <a id="searchCustomerButton" href="javascript:void(0)" class="btn btn-primary btn-block btn-sm"><i class="fas fa-plus-circle"></i> Add Customer </a>
                         </div>
                     </div>
                     <h6 class="text-center mt-1"><strong>OR</strong></h6>
                     <div class="d-flex align-items-center">
-                        <a id="addCustomerButton" href="javascript:void(0)" class="btn btn-success btn-sm text-white" style="width: 50%;margin-right: 10px"><i class="fas fa-plus"></i> Add Customer</a>
-                        <a id="removeCustomerButton" href="javascript:void(0)" class="btn btn-danger btn-sm" style="width: 50%"><i class="far fa-times-circle"></i> Remove</a>
+                        <button  class="btn btn-success btn-sm text-white" style="width: 50%; margin-right: 10px" data-bs-target="#customerModal" data-bs-toggle="modal" ><i class="fas fa-plus"></i> New Customer</button>
+                        <a  href="javascript:void(0)" class="btn btn-danger btn-sm" style="width: 50%"><i class="far fa-times-circle"></i> Remove</a>
                     </div>
-                    <div class="customer-info d-none">
+                    <div class="customer-info" v-if="isCustomer">
                         <p><strong>Name: </strong><span></span></p>
                         <p><strong>Mobile: </strong><span></span></p>
                         <p><strong>Address: </strong><span></span></p>
@@ -194,5 +304,49 @@
             </div>   
         </div>		
     </div>
+
+    <!-- Modal -->
+    <div id="customerModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label">Name <span class="required" title="requried">(*)</span></label>
+                            <input type="text" class="form-control" :class="{'is-invalid': error.customerNameError }" v-model="customer.name">
+                            <span class="invalid-feedback">{{ error.customerNameError }}</span>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Mobile Number <span class="required" title="requried">(*)</span></label>
+                            <input type="text" class="form-control" :class="{'is-invalid': error.customerMobileError }" v-model="customer.mobileNo">
+                            <span class="invalid-feedback">{{ error.customerMobileError }}</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" rows="3" style="resize:none" v-model="customer.address"></textarea>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col d-grid">
+                            <button class="btn btn-flat btn-primary" @click="storeCustomer"><i class="fas fa-hdd"></i> Create</button>
+                        </div>
+                        <div class="col d-grid">
+                            <button class="btn btn-flat btn-secondary"><i class="fas fa-close"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal -->
 </div>
 </template>

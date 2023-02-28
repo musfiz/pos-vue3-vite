@@ -111,3 +111,8 @@ body {
   font-size: 0.8rem;
   color: #dc3545
 }
+
+.customer-info p{
+  margin:0;
+  font-size: 12px;
+}
