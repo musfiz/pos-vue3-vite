@@ -59,6 +59,7 @@ export default {
       this.productId = ''
       this.productName = ''
       this.products = []
+      this.stock = []
       this.$refs.inputRef.clearInput()      
     }
   },
@@ -79,7 +80,7 @@ export default {
             <div class="card border-secondary">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5><i class="fa fa-list"></i> View Stock</h5>
-                    <router-link :to="{name: 'stock.add'}" class="btn btn-success btn-sm"><i class="fa fa-plus-circle"></i> Add Stock</router-link>
+                    <router-link :to="{name: 'stock.add'}" class="btn btn-success btn-sm btn-flat"><i class="fa fa-plus-circle"></i> Add Stock</router-link>
                 </div>
             </div>
         </div>
@@ -142,7 +143,18 @@ export default {
                           <th>Opening</th>
                       </tr>
                   </thead>
-                  <tbody class="text-center">                      
+                  <tbody class="">      
+                    <tr v-for="(item, index) in stock" :key="item.id"> 
+                      <td class="text-center">{{ index+1 }}</td>   
+                      <td class="text-center">{{ item.product_variant.product.code }}</td>   
+                      <td>{{ item.product_variant.product.product_name }}</td>   
+                      <td>{{ item.product_variant.variant.variant_name }}</td>   
+                      <td class="text-center">{{ item.dp_price }}</td>   
+                      <td class="text-center">{{ item.tp_price }}</td>   
+                      <td class="text-center">{{ item.price }}</td>   
+                      <td class="text-center">{{ item.current_quantity }}</td>   
+                      <td class="text-center">{{ item.opening_quantity }}</td>   
+                    </tr>            
                   </tbody>
               </table>
             </div>
