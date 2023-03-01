@@ -16,8 +16,9 @@ export default {
             productVariantId: '',
             productName: '',
             //
-            discount: '',
-            paymentTotal: '',
+            discount: 0,
+            grandTotal: 0,
+            paymentTotal: 0,
             acceptTotal: 0,
             refundTotal: '',
             //
@@ -34,6 +35,11 @@ export default {
                 customerMobileError: ''
             },
             isCustomer: false
+        }
+    },
+    computed: {
+        subtotal(){
+            return this.salesList.reduce((item, key) => item + key.total, 0)
         }
     },
     methods:{
@@ -87,16 +93,49 @@ export default {
             } else {
                 this.axios.get('stock/product/variant/'+ this.productVariantId)
                 .then(({data}) => {
-                    const check = this.salesList.find(obj => obj.id == data.data.id)
+                    const payload = data.data
+                    const check = this.salesList.find(obj => obj.stockId == payload.id)
                     if(check){
                         this.toast.info('Product already added to sales list.')
                     }else{
-                        
+                        let list = {
+                            'stockId': payload.id,
+                            'productName': payload.product_variant.product.product_name,
+                            'variantName': payload.product_variant.variant.variant_name,
+                            'price': Math.ceil(payload.price),
+                            'quantity': 1,  
+                            'total': Math.ceil(payload.price)                          
+                        }
+                        this.salesList.push(list)
+                        this.grandTotal = this.subtotal
+                        this.onClear()
                     }
                 })
                 .catch(({response}) => {
                     console.log(response);                
                 })
+            }
+        },
+
+        changeQuantity(stockId, qty){
+            const findItem = this.salesList.find(obj => obj.stockId === stockId)
+            const index = this.salesList.findIndex(obj => obj.stockId === stockId)
+            const price = findItem.price
+            const total = price * qty
+            this.salesList[index].total = total
+            this.grandTotal = total
+        },
+
+        removeItem(){
+            
+        },
+
+        calculateTotalAfterDiscount(){
+            if(this.discount > 0){
+                const percent = ( this.subtotal / 100 ) * this.discount
+                this.grandTotal = this.subtotal - percent
+            }else {
+                this.grandTotal = this.subtotal
             }
         },
 
@@ -108,6 +147,8 @@ export default {
             this.productId = ''
             this.productName = ''
             this.productVariantId = ''
+            this.products = []
+            this.variants = []
             this.$refs.inputRef.clearInput()      
         },
 
@@ -168,19 +209,21 @@ export default {
                                 :minInputLength="1" 
                                 :itemProjection="projectedItem"
                                 @selectItem="onSelectedItem"    
-                                @onInput="onInput"                                       
+                                @onInput="onInput" 
+                                autofocus   
+                                tabindex="0"                                   
                             ></typeahead>
                         </div>
                         <div class="col-3">
-                            <select id="variant" class="form-select form-select-sm" v-model="productVariantId">
+                            <select id="variant" class="form-select form-select-sm" v-model="productVariantId" tabindex="0">
                                 <option value="">-- Select Variant --</option>
                                 <option v-for="item in variants" :key="item.id" :value="item.product_variant_id" >{{ item.variant_name }}</option>
                             </select>
                         </div>
                         <div class="col">
-                            <a href="javascript:void(0)" class="btn btn-primary btn-sm" @click="addProductToInvoice">
+                            <a href="javascript:void(0)" class="btn btn-primary btn-sm" @click="addProductToInvoice" tabindex="0">
                                 <i class="fas fa-plus-circle"></i> Add Product</a>
-                            <a href="javascript:void(0)" class="btn btn-danger btn-sm ms-1">
+                            <a href="javascript:void(0)" class="btn btn-danger btn-sm ms-1" tabindex="-1">
                                 <i class="fa fa-sync-alt"></i> Clear </a>
                         </div>
                     </div>
@@ -192,14 +235,37 @@ export default {
                         <thead class="text-center">
                             <tr>
                                 <th>SN</th>
-                                <th width="55%">Product Name</th>
+                                <th width="45%">Product Name</th>
                                 <th width="12%">Type</th>
                                 <th width="10%">Quantity</th>
                                 <th>Price</th>
-                                <th>Action</th>
+                                <th>Total</th>
+                                <th width="5%">Action</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody style="font-size: 14px; font-weight: bold;">
+                            <tr v-for="(item, index) in salesList" :key="item.stockId">
+                                <td class="text-center">{{ index+1 }}</td>
+                                <td>{{ item.productName }}</td>
+                                <td class="text-center">{{ item.variantName }}</td>
+                                <td>
+                                    <input type="number" 
+                                        class="text-end"
+                                        v-model="item.quantity" 
+                                        style="width:70px" 
+                                        min="1"
+                                        tabindex="-1"
+                                        @input="changeQuantity(item.stockId, item.quantity) 
+                                                                               
+                                    ">
+                                </td>
+                                <td class="text-center">{{ item.price }}/-</td>
+                                <td class="text-center">{{ item.total }}/-</td>
+                                <td class="text-center">
+                                    <button class="bg-danger text-white" style="border: none" @click="removeItem(item.stockId)" tabindex="-1"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -234,18 +300,30 @@ export default {
                         <tr class="bg-secondary bg-gradient text-white">
                             <th class="text-end" width="60%"><h6 ><strong>Sub Total </strong></h6></th>
                             <th class="text-end" width="35%">
-                                <input type="text" class="form-control form-control-sm sub-total text-end" readonly>
+                                <input type="text" 
+                                    class="form-control form-control-sm sub-total text-end" 
+                                    readonly 
+                                    v-model="subtotal" 
+                                    @focus="$event.target.select()"
+                                >
                             </th> 
                             <th><h5>/=</h5></th>                           
                         </tr>
                         <tr>
-                            <th class="text-end"><h6><strong>Discount</strong></h6></th>
-                            <th ><input type="text" class="form-control form-control-sm discount text-end" v-model="discount" @keyup="calculateRefundTotal"></th>
+                            <th class="text-end" width="60%"><h6><strong> Discount</strong></h6></th>
+                            <th class="text-end" width="35%">
+                                <input type="text" 
+                                    class="form-control form-control-sm discount text-end" 
+                                    v-model="discount" 
+                                    @input="calculateTotalAfterDiscount" 
+                                    @focus="$event.target.select()"
+                                >
+                            </th>
                             <th><h5>%</h5></th>                            
                         </tr>
                         <tr class="bg-success bg-gradient text-white">
                             <th class="text-end"><h6><strong>Total</strong></h6></th>
-                            <th><input type="text" class="form-control form-control-sm total text-end" v-model="total" readonly></th>
+                            <th><input type="text" class="form-control form-control-sm total text-end" v-model="grandTotal" readonly></th>
                             <th><h5>/=</h5></th>                            
                         </tr>                        
                     </thead>
@@ -256,12 +334,19 @@ export default {
                     <thead>
                         <tr class="bg-primary bg-gradient text-white">
                             <th class="text-end" width="60%"><h6><strong>Paid</strong></h6></th>
-                            <th width="35%"><input type="text" class="form-control form-control-sm payment-total text-end" v-model="paymentTotal" @keyup="calculateRefundTotal"></th>
+                            <th width="35%">
+                                <input type="text" 
+                                    class="form-control form-control-sm payment-total text-end" 
+                                    v-model="paymentTotal"
+                                    @focus="$event.target.select()" 
+                                    @keyup="calculateRefundTotal"
+                                >
+                            </th>
                             <th><h5>/=</h5></th>                            
                         </tr>
                         <tr class="bg-danger bg-gradient text-white">
                             <th class="text-end"><h6><strong>Due</strong></h6></th>
-                            <th><input type="text" class="form-control form-control-sm amount-due text-end" readonly></th>
+                            <th><input type="text" class="form-control form-control-sm amount-due text-end" readonly tabindex="-1"></th>
                             <th><h5>/=</h5></th>                            
                         </tr>                 
                     </thead>
@@ -273,12 +358,20 @@ export default {
                     <thead>
                         <tr class="bg-warning bg-gradient text-white">
                             <th class="text-end" width="60%"><h6><strong>Accept</strong></h6></th>
-                            <th width="35%"><input type="text" class="form-control form-control-sm accept-total text-end" v-model="acceptTotal" @keyup="calculateRefundTotal"></th>
+                            <th width="35%">
+                                <input type="text" 
+                                    class="form-control form-control-sm accept-total text-end" 
+                                    accesskey="s"
+                                    v-model="acceptTotal" 
+                                    @focus="$event.target.select()" 
+                                    @keyup="calculateRefundTotal"
+                                    >
+                                </th>
                             <th><h5>/=</h5></th>                            
                         </tr>
                             <tr class="bg-info bg-gradient text-white">
                             <th class="text-end"><h6><strong>Refund</strong></h6></th>
-                            <th><input type="text" class="form-control form-control-sm refund-total text-end" v-model="refundTotal" readonly></th>
+                            <th><input type="text" class="form-control form-control-sm refund-total text-end" v-model="refundTotal" readonly tabindex="-1"></th>
                             <th><h5>/=</h5></th>                            
                         </tr>                 
                     </thead>
@@ -344,9 +437,7 @@ export default {
             </div>
         </div>
     </div>
-
-
-
     <!-- Modal -->
+
 </div>
 </template>
