@@ -11,6 +11,7 @@ export default {
             invoiceNo: '',
             products: [],
             variants: [],
+            
             salesList: [], //Sales product list
             productId: '',
             productVariantId: '',
@@ -19,28 +20,27 @@ export default {
             discount: 0,
             grandTotal: 0,
             paymentTotal: 0,
+            paymentDue: 0,
             acceptTotal: 0,
-            refundTotal: '',
-            //
+            refundTotal: 0,
             printAfterSale: '',                     
             completeButton: '<i class="fas fa-check"></i> Complete',
             completeBtnDisable: false,
-            customer: {
-                name: '',
-                mobileNo: '',
-                address: ''
-            },
-            error:{
-                customerNameError: '',
-                customerMobileError: ''
-            },
-            isCustomer: false
+
+            //Custmer Module Part
+            customer: [],
+            isCustomer: false,
+            selectedCustomer: {},
+            newCustomer: {},           
+            customerNameError: '',
+            customerMobileError: ''
+            
         }
     },
     computed: {
         subtotal(){
-            return this.salesList.reduce((item, key) => item + key.total, 0)
-        }
+            return Math.ceil(this.salesList.reduce((item, key) => item + key.total, 0))
+        },
     },
     methods:{
         projectedItem(item){
@@ -108,6 +108,7 @@ export default {
                         }
                         this.salesList.push(list)
                         this.grandTotal = this.subtotal
+                        this.paymentDue = this.subtotal
                         this.onClear()
                     }
                 })
@@ -118,29 +119,132 @@ export default {
         },
 
         changeQuantity(stockId, qty){
-            const findItem = this.salesList.find(obj => obj.stockId === stockId)
-            const index = this.salesList.findIndex(obj => obj.stockId === stockId)
+            const findItem = this.salesList.find(obj => obj.stockId == stockId)
+            const index = this.salesList.findIndex(obj => obj.stockId == stockId)
             const price = findItem.price
             const total = price * qty
             this.salesList[index].total = total
-            this.grandTotal = total
+            this.grandTotal = this.salesList.reduce((item, key) => item + key.total, 0)
+            this.paymentDue = this.grandTotal
         },
 
         removeItem(){
             
         },
 
+        //Customer All Funcitonality
+        projectedCustomer(item){
+            return item.name +' ('+ item.mobile_no +')'
+        },
+
+        onSelectedCustomer(item){            
+            this.selectedCustomer.customerId = item.id
+            this.selectedCustomer.name = item.name
+            this.selectedCustomer.mobileNo = item.mobile_no
+            this.selectedCustomer.address = item.address ? item.address : 'N/A'
+        },
+
+        onCustomerInput(item){
+            this.clearCustomer()
+            const params = {
+                'query': item.input
+            }
+            this.axios.get('common/customer/search', { params })
+                .then(({data}) => {
+                    this.customer = data.data
+                })
+                .catch(({response}) => {
+                    console.log(response);                
+                })
+        },
+
+        addCustomer(){
+            this.isCustomer = true
+            this.$refs.inputCustomerRef.clearInput()   
+        },
+
+        storeCustomer(){
+            this.axios.post('customer',  this.newCustomer)
+                .then(({data}) => {                 
+                    const item = data.data
+                    this.clearCustomer()
+                    this.isCustomer = true
+                    this.selectedCustomer.customerId = item.id
+                    this.selectedCustomer.name = item.name
+                    this.selectedCustomer.mobileNo = item.mobile_no
+                    this.selectedCustomer.address = item.address ? item.address : 'N/A'
+                    this.$refs.closeModal.click();
+                })
+                .catch(({response}) => {                      
+                    this.customerNameError = response.data.errors.name ? response.data.errors.name[0] : ''         
+                    this.customerMobileError = response.data.errors.mobile_no ? response.data.errors.mobile_no[0] : ''         
+                })
+        },
+
+        clearCustomer(){
+            this.isCustomer = false
+            this.selectedCustomer = {}
+            this.customer = []
+            this.newCustomer = {}
+        },
+        //Customer All Funcitonality        
+
         calculateTotalAfterDiscount(){
             if(this.discount > 0){
                 const percent = ( this.subtotal / 100 ) * this.discount
-                this.grandTotal = this.subtotal - percent
+                this.grandTotal = Math.ceil(this.subtotal - percent)
+            }else if(this.discount < 0){
+                this.discount = 0
+                this.grandTotal = this.subtotal
+                this.toast.warning("Discount can't be negetive. ")
             }else {
                 this.grandTotal = this.subtotal
             }
         },
 
-        storeCustomer(){
+        calculateDue(){
+            if(this.paymentTotal <= this.grandTotal){
+                this.paymentDue = this.grandTotal - this.paymentTotal
+            }else{
+                this.toast.warning("Due can't be negetive. ")
+                this.paymentDue = 0
+            }
+        },
 
+        calculateRefund(){        
+            const refund = this.acceptTotal - this.paymentTotal
+            this.refundTotal = 0
+            if(refund > 0){
+                this.refundTotal = refund
+            }
+        },
+
+        storeSales(){
+            if (this.salesList.length == 0){
+                this.toast.error('Product not added to list!')
+            } else if (!this.selectedCustomer.customerId){
+                this.toast.error('Please enter customer details!')
+            } else if(this.paymentTotal > this.grandTotal){
+                this.toast.error('Invalid paid total!')
+            }
+            else{
+                const params = {
+                'stock': this.salesList,
+                'customer_id': this.selectedCustomer.customerId,
+                'subtotal': this.subtotal,
+                'discount': this.discount,
+                'total': this.grandTotal,
+                'payment_total': parseFloat(this.paymentTotal),
+                'payment_due': this.paymentDue
+            }
+            this.axios.post('sales',  params)
+                .then(({data}) => {
+
+                })
+                .catch(({response}) => {       
+
+                })
+            }            
         },
 
         onClear(){
@@ -155,9 +259,6 @@ export default {
         onRefresh(){
 
         }
-    },
-    mounted(){
-        //
     }
 }
 </script>
@@ -275,25 +376,36 @@ export default {
                 <div class="card-body pad-6">
                     <div class="row g-1">
                         <div class="col-8">
-                            <input type="hidden">
-                            <input type="text" class="form-control form-control-sm" placeholder="Search Customer">
+                            <typeahead 
+                                class="form-control form-control-sm"
+                                ref="inputCustomerRef"
+                                placeholder="Search by name or mobile..."
+                                :items="customer"
+                                :minInputLength="1" 
+                                :itemProjection="projectedCustomer"
+                                @selectItem="onSelectedCustomer"    
+                                @onInput="onCustomerInput" 
+                                autofocus   
+                                tabindex="0"                                   
+                            ></typeahead>
                         </div>
                         <div class="col-4">
-                            <a id="searchCustomerButton" href="javascript:void(0)" class="btn btn-primary btn-block btn-sm"><i class="fas fa-plus-circle"></i> Add Customer </a>
+                            <a id="searchCustomerButton" href="javascript:void(0)" class="btn btn-primary btn-block btn-sm" @click="addCustomer"><i class="fas fa-plus-circle"></i> Add Customer </a>
                         </div>
                     </div>
                     <h6 class="text-center mt-1"><strong>OR</strong></h6>
                     <div class="d-flex align-items-center">
-                        <button  class="btn btn-success btn-sm text-white" style="width: 50%; margin-right: 10px" data-bs-target="#customerModal" data-bs-toggle="modal" ><i class="fas fa-plus"></i> New Customer</button>
-                        <a  href="javascript:void(0)" class="btn btn-danger btn-sm" style="width: 50%"><i class="far fa-times-circle"></i> Remove</a>
+                        <button  class="btn btn-success btn-sm text-white" style="width: 50%; margin-right: 10px" data-bs-target="#customerModal" data-bs-toggle="modal" @click="clearCustomer"><i class="fas fa-plus"></i> New Customer</button>
+                        <a class="btn btn-danger btn-sm" style="width: 50%" @click="clearCustomer"><i class="far fa-times-circle"></i> Remove</a>
                     </div>
                     <div class="customer-info" v-if="isCustomer">
-                        <p><strong>Name: </strong><span></span></p>
-                        <p><strong>Mobile: </strong><span></span></p>
-                        <p><strong>Address: </strong><span></span></p>
+                        <p><strong>Name: </strong><span>{{ selectedCustomer.name }}</span></p>
+                        <p><strong>Mobile: </strong><span>{{ selectedCustomer.mobileNo }}</span></p>
+                        <p><strong>Address: </strong><span>{{ selectedCustomer.address }}</span></p>
                     </div>       
                 </div>
             </div>
+
             <div class="card bg-light" style="margin-top:0.5rem">              
                 <table class="table-sm">
                     <thead>
@@ -329,6 +441,7 @@ export default {
                     </thead>
                 </table>
             </div>
+
             <div class="card bg-light" style="margin-top:0.5rem">              
                 <table class="table-sm">
                     <thead>
@@ -339,14 +452,14 @@ export default {
                                     class="form-control form-control-sm payment-total text-end" 
                                     v-model="paymentTotal"
                                     @focus="$event.target.select()" 
-                                    @keyup="calculateRefundTotal"
+                                    @keyup="calculateDue"
                                 >
                             </th>
                             <th><h5>/=</h5></th>                            
                         </tr>
                         <tr class="bg-danger bg-gradient text-white">
                             <th class="text-end"><h6><strong>Due</strong></h6></th>
-                            <th><input type="text" class="form-control form-control-sm amount-due text-end" readonly tabindex="-1"></th>
+                            <th><input type="text" class="form-control form-control-sm amount-due text-end" readonly tabindex="-1" v-model="paymentDue"></th>
                             <th><h5>/=</h5></th>                            
                         </tr>                 
                     </thead>
@@ -364,7 +477,7 @@ export default {
                                     accesskey="s"
                                     v-model="acceptTotal" 
                                     @focus="$event.target.select()" 
-                                    @keyup="calculateRefundTotal"
+                                    @keyup="calculateRefund"
                                     >
                                 </th>
                             <th><h5>/=</h5></th>                            
@@ -378,28 +491,31 @@ export default {
                 </table>
             </div>
 
+            <div class="col d-grid" style="margin-top:0.5rem;"> 
+                <button class="btn btn-success btn-flat" :disabled="completeBtnDisable"  v-html="completeButton" @click="storeSales"></button>  
+            </div>  
+
             <div v-if="isNewInvoice">
                 <div class="card" style="margin-top:0.5rem;"> 
                     <div class="card-body" style="margin-left:0.5rem;">
                         <div class="row">
                             <div class="col-md-6">
-                                <input type="checkbox" v-model="isPrintInvoice"  style="transform: scale(1.8);">&nbsp;&nbsp;<strong>Print Invoice </strong>
+                                <input type="checkbox" v-model="isPrintInvoice"  style="transform: scale(1.2);">&nbsp;&nbsp;<strong>Print Invoice </strong>
                             </div>  
                             <div class="col-md-6">
-                                <input type="checkbox" v-model="isDownloadPdf"  style="transform: scale(1.8);">&nbsp;&nbsp;<strong>Download PDF </strong>
+                                <input type="checkbox" v-model="isDownloadPdf"  style="transform: scale(1.2);">&nbsp;&nbsp;<strong>Download PDF </strong>
                             </div>  
                         </div> 
                     </div>     
                 </div>
-            </div>             
-            <div class="col d-grid" style="margin-top:0.5rem;"> 
-                <button class="btn btn-success btn-flat" :disabled="completeBtnDisable"  v-html="completeButton"></button>  
-            </div>   
+            </div>
+
+            
         </div>		
     </div>
 
     <!-- Modal -->
-    <div id="customerModal" class="modal fade" tabindex="-1" role="dialog">
+    <div id="customerModal" ref="customerModal" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -410,19 +526,19 @@ export default {
                     <div class="row">
                         <div class="col">
                             <label class="form-label">Name <span class="required" title="requried">(*)</span></label>
-                            <input type="text" class="form-control" :class="{'is-invalid': error.customerNameError }" v-model="customer.name">
-                            <span class="invalid-feedback">{{ error.customerNameError }}</span>
+                            <input type="text" class="form-control" :class="{'is-invalid': customerNameError }" v-model="newCustomer.name">
+                            <span class="invalid-feedback">{{ customerNameError }}</span>
                         </div>
                         <div class="col">
                             <label class="form-label">Mobile Number <span class="required" title="requried">(*)</span></label>
-                            <input type="text" class="form-control" :class="{'is-invalid': error.customerMobileError }" v-model="customer.mobileNo">
-                            <span class="invalid-feedback">{{ error.customerMobileError }}</span>
+                            <input type="text" class="form-control" :class="{'is-invalid': customerMobileError }" v-model="newCustomer.mobile_no">
+                            <span class="invalid-feedback">{{ customerMobileError }}</span>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
                             <label class="form-label">Address</label>
-                            <textarea class="form-control" rows="3" style="resize:none" v-model="customer.address"></textarea>
+                            <textarea class="form-control" rows="3" style="resize:none" v-model="newCustomer.address"></textarea>
                         </div>
                     </div>
                     <div class="row mt-3">
@@ -430,7 +546,7 @@ export default {
                             <button class="btn btn-flat btn-primary" @click="storeCustomer"><i class="fas fa-hdd"></i> Create</button>
                         </div>
                         <div class="col d-grid">
-                            <button class="btn btn-flat btn-secondary"><i class="fas fa-close"></i> Close</button>
+                            <button ref="closeModal" class="btn btn-flat btn-secondary" data-bs-dismiss="modal"><i class="fas fa-close"></i> Close</button>
                         </div>
                     </div>
                 </div>
@@ -438,6 +554,5 @@ export default {
         </div>
     </div>
     <!-- Modal -->
-
 </div>
 </template>
