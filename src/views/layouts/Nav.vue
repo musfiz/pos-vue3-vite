@@ -8,8 +8,12 @@ export default {
           this.toast.info('<strong>'+ data.message +'</strong>')        
           // console.log(data)
         })
-        .catch((error) => {
-          this.toast.error('<strong>Something went wrong !</strong>')
+        .catch(({response}) => {
+          if(response.status == 401){
+            this.$store.dispatch('logout', {})  
+          }else{
+            this.toast.error('<strong>Something went wrong !</strong>')
+          }
         });
     }
   }

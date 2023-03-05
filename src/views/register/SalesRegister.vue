@@ -5,10 +5,13 @@ export default {
     components: { Typeahead },
     data(){
         return{
+            isValid: true,
             isNewInvoice: true,
             isPrintInvoice: true,
-            isDownloadPdf: false,      
-            invoiceNo: '',
+            isDownloadPdf: false, 
+            invoiceNo:'',
+            invoiceCodeHead: '',     
+            invoiceCodeNumber: '',
             products: [],
             variants: [],
             
@@ -25,7 +28,6 @@ export default {
             refundTotal: 0,
             printAfterSale: '',                     
             completeButton: '<i class="fas fa-check"></i> Complete',
-            completeBtnDisable: false,
 
             //Custmer Module Part
             customer: [],
@@ -43,6 +45,28 @@ export default {
         },
     },
     methods:{
+        getInvoiceNo(){
+            this.axios.get('invoice/sales')
+                .then(({data}) => {
+                    this.invoiceCodeHead = data.data.head
+                    this.invoiceCodeNumber = data.data.number
+                    this.invoiceNo = data.data.invoice_no
+                })
+                .catch(({response}) => {
+                    console.log(response); 
+                })
+        },
+        updateInvoiceNo(){
+            this.axios.post('invoice/sales')
+                .then(({data}) => {
+                    this.invoiceCodeHead = data.data.head
+                    this.invoiceCodeNumber = data.data.number
+                    this.invoiceNo = data.data.invoice_no
+                })
+                .catch(({response}) => {
+                    console.log(response); 
+                })
+        },
         projectedItem(item){
             return item.name +' ('+ item.code +')'
         },
@@ -128,8 +152,9 @@ export default {
             this.paymentDue = this.grandTotal
         },
 
-        removeItem(){
-            
+        removeItem(stockId){
+            const index = this.salesList.findIndex(obj => obj.stockId == stockId)
+            this.salesList.splice(index, 1)
         },
 
         //Customer All Funcitonality
@@ -193,6 +218,7 @@ export default {
             if(this.discount > 0){
                 const percent = ( this.subtotal / 100 ) * this.discount
                 this.grandTotal = Math.ceil(this.subtotal - percent)
+                this.paymentDue = this.grandTotal
             }else if(this.discount < 0){
                 this.discount = 0
                 this.grandTotal = this.subtotal
@@ -205,8 +231,10 @@ export default {
         calculateDue(){
             if(this.paymentTotal <= this.grandTotal){
                 this.paymentDue = this.grandTotal - this.paymentTotal
+                this.isValid = true
             }else{
                 this.toast.warning("Due can't be negetive. ")
+                this.isValid = false
                 this.paymentDue = 0
             }
         },
@@ -231,14 +259,16 @@ export default {
                 const params = {
                 'stock': this.salesList,
                 'customer_id': this.selectedCustomer.customerId,
+                'invoice_no': this.invoiceNo,
                 'subtotal': this.subtotal,
                 'discount': this.discount,
                 'total': this.grandTotal,
                 'payment_total': parseFloat(this.paymentTotal),
-                'payment_due': this.paymentDue
+                'due': this.paymentDue
             }
             this.axios.post('sales',  params)
                 .then(({data}) => {
+                    this.updateInvoiceNo();
 
                 })
                 .catch(({response}) => {       
@@ -259,6 +289,9 @@ export default {
         onRefresh(){
 
         }
+    },
+    mounted(){
+        this.getInvoiceNo()
     }
 }
 </script>
@@ -283,8 +316,8 @@ export default {
                     <div class="row mb-1">
                         <div class="col-4">
                             <div class="input-group input-group-sm">
-                                <span class="input-group-text">INV-</span>
-                                <input type="text" class="form-control" placeholder="Invoice Number">
+                                <span class="input-group-text">{{ invoiceCodeHead }}-</span>
+                                <input type="text" class="form-control" placeholder="Invoice Number" v-model="invoiceCodeNumber">
                             </div>
                         </div>
                         <div class="col-3 g-0">
@@ -492,7 +525,7 @@ export default {
             </div>
 
             <div class="col d-grid" style="margin-top:0.5rem;"> 
-                <button class="btn btn-success btn-flat" :disabled="completeBtnDisable"  v-html="completeButton" @click="storeSales"></button>  
+                <button class="btn btn-success btn-flat" :disabled="!isValid"  v-html="completeButton" @click="storeSales"></button>  
             </div>  
 
             <div v-if="isNewInvoice">
