@@ -10,8 +10,6 @@ export default {
             isPrintInvoice: true,
             isDownloadPdf: false, 
             invoiceNo:'',
-            invoiceCodeHead: '',     
-            invoiceCodeNumber: '',
             products: [],
             variants: [],
             
@@ -27,7 +25,7 @@ export default {
             acceptTotal: 0,
             refundTotal: 0,
             printAfterSale: '',                     
-            completeButton: '<i class="fas fa-check"></i> Complete',
+            completeButton: '<i class="fas fa-check"></i> Confirm',
 
             //Custmer Module Part
             customer: [],
@@ -45,28 +43,6 @@ export default {
         },
     },
     methods:{
-        getInvoiceNo(){
-            this.axios.get('invoice/sales')
-                .then(({data}) => {
-                    this.invoiceCodeHead = data.data.head
-                    this.invoiceCodeNumber = data.data.number
-                    this.invoiceNo = data.data.invoice_no
-                })
-                .catch(({response}) => {
-                    console.log(response); 
-                })
-        },
-        updateInvoiceNo(){
-            this.axios.post('invoice/sales')
-                .then(({data}) => {
-                    this.invoiceCodeHead = data.data.head
-                    this.invoiceCodeNumber = data.data.number
-                    this.invoiceNo = data.data.invoice_no
-                })
-                .catch(({response}) => {
-                    console.log(response); 
-                })
-        },
         projectedItem(item){
             return item.name +' ('+ item.code +')'
         },
@@ -257,23 +233,22 @@ export default {
             }
             else{
                 const params = {
-                'stock': this.salesList,
-                'customer_id': this.selectedCustomer.customerId,
-                'invoice_no': this.invoiceNo,
-                'subtotal': this.subtotal,
-                'discount': this.discount,
-                'total': this.grandTotal,
-                'payment_total': parseFloat(this.paymentTotal),
-                'due': this.paymentDue
-            }
-            this.axios.post('sales',  params)
-                .then(({data}) => {
-                    this.updateInvoiceNo();
+                    'stock': this.salesList,
+                    'customer_id': this.selectedCustomer.customerId,
+                    'subtotal': this.subtotal,
+                    'discount': this.discount,
+                    'total': this.grandTotal,
+                    'payment_total': parseFloat(this.paymentTotal),
+                    'due': this.paymentDue
+                }
+                this.axios.post('sales',  params)
+                    .then(({data}) => {
+                        this.toast.success('Sales has been created successfully.')
+                        this.onRefresh()
+                    })
+                    .catch(({response}) => {       
 
-                })
-                .catch(({response}) => {       
-
-                })
+                    })
             }            
         },
 
@@ -287,12 +262,42 @@ export default {
         },
 
         onRefresh(){
+            this.products = []
+            this.variants = []            
+            this.salesList = []
 
+            this.productId = ''
+            this.productVariantId = ''
+            this.productName = ''
+            this.discount = 0
+            this.grandTotal = 0
+            this.paymentTotal = 0
+            this.paymentDue = 0
+            this.acceptTotal = 0
+            this.refundTotal = 0
+            this.customer = []
+            this.isCustomer =false
+            this.selectedCustomer = {}
+            this.newCustomer = {}          
+            this.customerNameError = ''
+            this.customerMobileError = ''
+        },
+
+        generatePDF(){
+            const content = this.$refs.salesPrint.innerHTML
+            let a = window.open('', '', 'height=500, width=1000');
+            // a.document.write('<html>');
+            // a.document.write('<body > <h1>Div contents are <br>');
+            a.document.write(content);
+            // a.document.write('</body></html>');
+            a.document.close();
+            a.print();
+        },
+        newFunction(){
+            alert()
+            window.close();
         }
     },
-    mounted(){
-        this.getInvoiceNo()
-    }
 }
 </script>
 
@@ -316,14 +321,14 @@ export default {
                     <div class="row mb-1">
                         <div class="col-4">
                             <div class="input-group input-group-sm">
-                                <span class="input-group-text">{{ invoiceCodeHead }}-</span>
-                                <input type="text" class="form-control" placeholder="Invoice Number" v-model="invoiceCodeNumber">
+                                <span class="input-group-text">INV-</span>
+                                <input type="text" class="form-control" placeholder="Invoice Number" v-model="invoiceNo">
                             </div>
                         </div>
                         <div class="col-3 g-0">
                             <button href="javascript:void(0)" class="btn btn-success btn-sm btn-flat me-1">
                                 <i class="fas fa-search"></i> Search </button>
-                            <a href="http://127.0.0.1:8000/sales/add" class="btn btn-warning text-white btn-sm btn-flat">
+                            <a class="btn btn-warning text-white btn-sm btn-flat" @click="onRefresh">
                                 <i class="fa fa-sync-alt"></i> Refresh </a>
                         </div>
                         <div class="col-5 d-flex justify-content-end">                               
@@ -357,7 +362,7 @@ export default {
                         <div class="col">
                             <a href="javascript:void(0)" class="btn btn-primary btn-sm" @click="addProductToInvoice" tabindex="0">
                                 <i class="fas fa-plus-circle"></i> Add Product</a>
-                            <a href="javascript:void(0)" class="btn btn-danger btn-sm ms-1" tabindex="-1">
+                            <a class="btn btn-danger btn-sm ms-1" tabindex="-1" @click="onClear">
                                 <i class="fa fa-sync-alt"></i> Clear </a>
                         </div>
                     </div>
@@ -524,26 +529,27 @@ export default {
                 </table>
             </div>
 
-            <div class="col d-grid" style="margin-top:0.5rem;"> 
-                <button class="btn btn-success btn-flat" :disabled="!isValid"  v-html="completeButton" @click="storeSales"></button>  
-            </div>  
-
-            <div v-if="isNewInvoice">
-                <div class="card" style="margin-top:0.5rem;"> 
-                    <div class="card-body" style="margin-left:0.5rem;">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <input type="checkbox" v-model="isPrintInvoice"  style="transform: scale(1.2);">&nbsp;&nbsp;<strong>Print Invoice </strong>
-                            </div>  
-                            <div class="col-md-6">
-                                <input type="checkbox" v-model="isDownloadPdf"  style="transform: scale(1.2);">&nbsp;&nbsp;<strong>Download PDF </strong>
-                            </div>  
+            <div class="card bg-light">
+                <div class="card-body pad-6">
+                    <div class="row">
+                        <div class="col-6 d-grid mb-2"> 
+                            <button class="btn btn-success btn-flat" :disabled="!isValid"  v-html="completeButton" @click="storeSales"></button>  
                         </div> 
-                    </div>     
+                        <div class="col-6 d-grid mb-2"> 
+                            <button class="btn btn-dark btn-flat text-white"> <i class="fas fa-print"></i> Re Print</button>  
+                        </div>
+                    </div>  
+                    <div class="row">
+                        <div class="col-6 d-grid mt-1"> 
+                            <button class="btn btn-primary btn-flat"><i class="fas fa-refresh" @click="onRefresh"></i> Refresh</button>  
+                        </div> 
+                        <div class="col-6 d-grid mt-1"> 
+                            <button class="btn btn-secondary btn-flat" @click="generatePDF"> <i class="fas fa-file-pdf"></i> PDF</button>  
+                        </div>
+                    </div>   
                 </div>
             </div>
-
-            
+                      
         </div>		
     </div>
 
@@ -587,5 +593,16 @@ export default {
         </div>
     </div>
     <!-- Modal -->
+
+
+    <!-- print area -->
+    <div ref="salesPrint" style="visibility: hidden;" @focus="newFunction">          
+        <h2>Smart POS</h2>            
+        <p>
+            This is inside the div and will be printed
+            on the screen after the click.
+        </p>
+    </div>
+
 </div>
 </template>

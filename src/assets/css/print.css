@@ -1,0 +1,189 @@
+/* Setting for paper print */
+@page {
+  size: A4;
+  /* paper size */
+  margin: 0;
+  /* Invisible header and footer (only for chrome) */
+}
+
+/* Initialize Elements */
+* {
+  /* Clear margin and padding */
+  margin: 0;
+  padding: 0;
+  color: black;
+  font-size: 11pt;
+  font-weight: normal;
+}
+
+
+
+/* Initialize list */
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+/* Page layout (section.sheet を１ページとする) */
+.sheet {
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+  page-break-after: always;
+  /* Paper size A4 */
+  height: 297mm;
+  width: 210mm;
+  /* Padding size */
+  padding-top: 25mm;
+  padding-left: 20mm;
+  padding-right: 20mm;
+}
+
+/* Append Page number */
+body {
+  counter-reset: sheet snapshot;
+  /* Initialize counter for page number and snapshot */
+}
+
+.sheet::after {
+  position: absolute;
+  bottom: 10mm;
+  right: 20mm;
+  counter-increment: sheet;
+  font-size: 12px;
+  content: "Page " counter(sheet);
+}
+
+/* Style for preview */
+@media screen {
+  .sheet {
+    background: white;
+    /* Drop shadow */
+    box-shadow: 0 0.5mm 2mm rgba(0, 0, 0, 0.3);
+    margin: 5mm auto;
+  }
+}
+
+
+/* */
+.text-left {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.clear-element {
+  clear: both;
+}
+
+div.row_general_info {
+  margin-bottom: 8mm;
+}
+
+/* Title */
+h1.heading {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: black; */
+  font-size: 35px;
+  font-weight: normal;
+  min-height: 50px;
+}
+
+h2.slogan {
+  font-size: 20px;
+  font-weight: normal;
+  text-decoration: none;
+}
+
+h3 .date {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+
+/* memo */
+/* p.heading {
+  padding-top: 2mm;
+  width: 170mm;
+  white-space: pre-wrap;
+  word-break:break-all;
+} */
+
+img {
+  width: 100%;
+  max-height: 140mm;
+  object-fit: contain;
+}
+
+/* Custom CSS */
+.report-body{
+  min-height: 800px;
+  margin-top: 20px
+}
+
+.report-footer{
+  padding-top: 30px;
+}
+
+.report-footer .border{
+  border-top: 1px solid #5f5f5f;
+  padding-top: 5px;
+}
+
+.report-footer p{
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.table {
+  display: table;
+  width: 100%;
+  border-spacing: 1px;
+  border-collapse: collapse;
+}
+
+.table .row {
+  display:table-row;
+  width:auto;
+  clear: both;  
+}
+
+.table .row .col {
+  display: table-cell;
+  vertical-align: top;
+  padding: 6px;
+  line-height: 1.42857143;
+  border: 1px solid gray;
+}
+
+.table .row .head{
+  font-weight: bold;
+}
+
+.w-20 {
+  width: 20%
+}
+
+.w-25 {
+  width: 25%
+}
+
+.w-40 {
+  width: 40%
+}
+
+.w-50 {
+  width: 50%
+}
+
+.w-70 {
+  width: 70%
+}
+/*Custom CSS */
