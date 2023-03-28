@@ -283,19 +283,24 @@ export default {
             this.customerMobileError = ''
         },
 
-        generatePDF(){
-            const content = this.$refs.salesPrint.innerHTML
-            let a = window.open('', '', 'height=500, width=1000');
-            // a.document.write('<html>');
-            // a.document.write('<body > <h1>Div contents are <br>');
-            a.document.write(content);
-            // a.document.write('</body></html>');
-            a.document.close();
-            a.print();
-        },
-        newFunction(){
-            alert()
-            window.close();
+        generatePDF() {
+            let frame = this.$refs.salesPrint.contentWindow;
+            const contents = this.$refs.salesPrint.innerHTML;
+            frame.document.open();
+            frame.document.write('<html lang="en"><head><title>Sales Register</title>');
+            frame.document.write('<link rel="stylesheet" type="text/css" href="../css/print.css"/>');
+            frame.document.write('<link href="./css/sales.css" />');
+            frame.document.write('</head><body>');
+            frame.document.write(contents);
+            frame.document.write('</body></html>');
+            frame.document.close();
+            setTimeout(function () {
+                // window.frames["frame"].focus();
+                // window.frames["frame"].print();
+                frame.focus();
+                frame.print();
+            }, 1000);
+            return false;
         }
     },
 }
@@ -596,13 +601,20 @@ export default {
 
 
     <!-- print area -->
-    <div ref="salesPrint" style="visibility: hidden;" @focus="newFunction">          
-        <h2>Smart POS</h2>            
-        <p>
-            This is inside the div and will be printed
-            on the screen after the click.
-        </p>
-    </div>
+    <iframe ref="salesPrint" style="visibility: hidden;">          
+        <div class="print-area">
+            <div class="container">
+                <div class="logo">
+                    <img src="" alt="">
+                </div>
+                <div class="heading">
+                    Howlader Electric
+                </div>
+            </div>
+        </div>
+    </iframe>
+
+    
 
 </div>
 </template>
