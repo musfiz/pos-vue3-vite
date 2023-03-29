@@ -6,9 +6,6 @@ export default {
     data(){
         return{
             isValid: true,
-            isNewInvoice: true,
-            isPrintInvoice: true,
-            isDownloadPdf: false, 
             invoiceNo:'',
             products: [],
             variants: [],
@@ -23,17 +20,18 @@ export default {
             paymentTotal: 0,
             paymentDue: 0,
             acceptTotal: 0,
-            refundTotal: 0,
-            printAfterSale: '',                     
-            completeButton: '<i class="fas fa-check"></i> Confirm',
+            refundTotal: 0,               
+            completeButton: '<i class="fas fa-check"></i> Sales Complete',
 
-            //Custmer Module Part
+            //Customer Module Part
             customer: [],
             isCustomer: false,
             selectedCustomer: {},
             newCustomer: {},           
             customerNameError: '',
-            customerMobileError: ''
+            customerMobileError: '',
+            //
+            printList: []
             
         }
     },
@@ -246,10 +244,33 @@ export default {
                         this.toast.success('Sales has been created successfully.')
                         this.onRefresh()
                     })
-                    .catch(({response}) => {       
-
-                    })
+                    .catch(({response}) => {})
             }            
+        },
+
+        getReceiptByInvoiceNo(){
+            if(this.invoiceNo){
+                this.isValid = false
+                const params = 'INV-'+this.invoiceNo
+                this.axios.get('common/sales/'+ params)
+                    .then(({data}) => {
+                        const payload = data.data
+                        payload.sales_details.forEach((obj) => {
+                            const list = {
+                                'stockId': obj.stock.id,
+                                'productName': obj.stock.product_variant.product.product_name,
+                                'variantName': obj.stock.product_variant.variant.variant_name,
+                                'price': Math.ceil(obj.stock.price),
+                                'quantity': obj.quantity,
+                                'total': Math.ceil(obj.stock.price)    
+                            }
+                            this.salesList.push(list)
+                        })
+                    })
+                    .catch(({response}) => {})
+            }else{
+                this.toast.error('Please enter invoice number!') 
+            }
         },
 
         onClear(){
@@ -262,10 +283,13 @@ export default {
         },
 
         onRefresh(){
+            this.isValid = true
+            this.invoiceNo = ''
             this.products = []
             this.variants = []            
             this.salesList = []
 
+            this.$refs.inputRef.clearInput()   
             this.productId = ''
             this.productVariantId = ''
             this.productName = ''
@@ -283,12 +307,12 @@ export default {
             this.customerMobileError = ''
         },
 
-        generatePDF() {
+        generatePrintPreview() {
             let frame = this.$refs.salesPrint.contentWindow;
             const contents = this.$refs.salesPrint.innerHTML;
             frame.document.open();
             frame.document.write('<html lang="en"><head><title>Sales Register</title>');
-            frame.document.write('<link rel="stylesheet" type="text/css" href="/public/css/sales.css"/>');
+            frame.document.write('<link rel="stylesheet" type="text/css" href="/css/sales.css"/>');
             frame.document.write('</head><body>');
             frame.document.write(contents);
             frame.document.write('</body></html>');
@@ -300,6 +324,10 @@ export default {
                 frame.print();
             }, 500);
             return false;
+        },
+
+        rePrintReceipt(){
+            this.generatePrintPreview()
         }
     },
 }
@@ -330,7 +358,7 @@ export default {
                             </div>
                         </div>
                         <div class="col-3 g-0">
-                            <button href="javascript:void(0)" class="btn btn-success btn-sm btn-flat me-1">
+                            <button class="btn btn-success btn-sm btn-flat me-1" @click="getReceiptByInvoiceNo">
                                 <i class="fas fa-search"></i> Search </button>
                             <a class="btn btn-warning text-white btn-sm btn-flat" @click="onRefresh">
                                 <i class="fa fa-sync-alt"></i> Refresh </a>
@@ -536,19 +564,16 @@ export default {
             <div class="card bg-light">
                 <div class="card-body pad-6">
                     <div class="row">
-                        <div class="col-6 d-grid mb-2"> 
+                        <div class="col-12 d-grid mb-2"> 
                             <button class="btn btn-success btn-flat" :disabled="!isValid"  v-html="completeButton" @click="storeSales"></button>  
-                        </div> 
-                        <div class="col-6 d-grid mb-2"> 
-                            <button class="btn btn-dark btn-flat text-white"> <i class="fas fa-print"></i> Re Print</button>  
-                        </div>
+                        </div>                         
                     </div>  
                     <div class="row">
-                        <div class="col-6 d-grid mt-1"> 
-                            <button class="btn btn-primary btn-flat"><i class="fas fa-refresh" @click="onRefresh"></i> Refresh</button>  
+                        <div class="col-6 d-grid"> 
+                            <button class="btn btn-primary btn-flat" @click="onRefresh"><i class="fas fa-refresh"></i> Refresh</button>  
                         </div> 
-                        <div class="col-6 d-grid mt-1"> 
-                            <button class="btn btn-secondary btn-flat" @click="generatePDF"> <i class="fas fa-file-pdf"></i> PDF</button>  
+                        <div class="col-6 d-grid"> 
+                            <button class="btn btn-secondary btn-flat" @click="rePrintReceipt"> <i class="fas fa-print"></i> Re Print</button>  
                         </div>
                     </div>   
                 </div>
@@ -686,9 +711,7 @@ export default {
                 </div>
             </div>
         </div>
-    </iframe>
-
-    
+    </iframe>   
 
 </div>
 </template>
