@@ -1,0 +1,119 @@
+h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+    padding:0;
+}
+.print-area {
+    display:flex;
+    justify-content: center;
+    align-items: center;  
+    font-family:courier;
+}
+
+.container {
+    display:flex;
+    justify-content: center;
+    flex-direction: column;
+    /* border: 1px dotted #afafaf; */
+    width: 300px;
+    color: #414141;
+}
+
+.separator {
+    width: 300px;
+    border: 1px dashed #868686;
+}
+
+.text-left{
+    text-align: left;
+}
+
+.text-center{
+    text-align: center;
+}
+
+.text-right{
+    text-align: right;
+}
+
+.pre-head {
+    font-size: 18pt;
+    padding-bottom: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    display: flex;
+    align-items: center; 
+    flex-direction: column; 
+}
+
+.head {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 10px 0;
+}
+
+.head h2 {
+    font-size: 20pt;
+    text-transform: uppercase;
+}
+
+.head h4 {
+    font-size: 12pt;
+}
+
+.head h5 {
+    font-size: 10pt;
+}
+
+.post-head {
+    padding: 6px 0;
+}
+
+.post-head h3{
+    font-size: 9pt;
+}
+
+.list{
+    padding: 10px 0;
+}
+
+.list-table{
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 7pt;
+    color: #414141;
+}
+.list-table th{
+    border-top: 1px dashed #868686;
+    border-bottom: 1px dashed #868686;
+}
+.list-table td{   
+    font-weight: bold;
+}
+
+.list-table tr:last-child{   
+    border-bottom: 1px dashed #868686;
+}
+
+.footer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: bold;
+}
+
+.footer-first{
+    font-size: 7pt;
+    margin-bottom: 10px;
+}
+
+.footer-last{
+    font-size: 10pt; 
+    margin-top: 10px  
+}
+
+
+
+
+

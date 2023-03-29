@@ -288,8 +288,7 @@ export default {
             const contents = this.$refs.salesPrint.innerHTML;
             frame.document.open();
             frame.document.write('<html lang="en"><head><title>Sales Register</title>');
-            frame.document.write('<link rel="stylesheet" type="text/css" href="../css/print.css"/>');
-            frame.document.write('<link href="./css/sales.css" />');
+            frame.document.write('<link rel="stylesheet" type="text/css" href="/public/css/sales.css"/>');
             frame.document.write('</head><body>');
             frame.document.write(contents);
             frame.document.write('</body></html>');
@@ -299,7 +298,7 @@ export default {
                 // window.frames["frame"].print();
                 frame.focus();
                 frame.print();
-            }, 1000);
+            }, 500);
             return false;
         }
     },
@@ -604,11 +603,86 @@ export default {
     <iframe ref="salesPrint" style="visibility: hidden;">          
         <div class="print-area">
             <div class="container">
-                <div class="logo">
-                    <img src="" alt="">
+                <div class="pre-head">
+                    <h3>Cash Receipt</h3>
                 </div>
-                <div class="heading">
-                    Howlader Electric
+                <div class="separator"></div>
+                <div class="head">
+                    <h2>Howlader Electric</h2>
+                    <h4>Bottola Shariaptur-8000</h4>
+                    <h5>01556984227, 01556984219</h5>
+                </div>
+                <div class="separator"></div>
+                <div class="post-head">
+                    <h3>Invoice No: INV-000003</h3>
+                    <h3>Date: 13/03/2023 10:34 PM</h3>
+                    <h3>Sold By: Ador Rahman</h3>
+                </div>
+                <div class="list">
+                    <table class="list-table">
+                        <thead>
+                            <th>SN</th>
+                            <th width="60%">PRODUCT</th>
+                            <th>QTY</th>
+                            <th class="text-right">PRICE</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center" width="10%">1</td>
+                                <td>VISION Motor Body River Wind2 18"Stand Fan 5Blade</td>
+                                <td class="text-center">1</td>
+                                <td class="text-right">2500</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" width="10%">2</td>
+                                <td>VISION Smart Saver Ceiling Fan 56" (Ivory)</td>
+                                <td class="text-center">1</td>
+                                <td class="text-right">3160</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="list-table">
+                        <tbody>
+                            <tr>
+                                <td colspan="2" width="60%"></td>
+                                <td class="text-left">SubTotal</td>
+                                <td class="text-right">5660</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"></td>
+                                <td class="text-left">Discount(%)</td>
+                                <td class="text-right">10</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"></td>
+                                <td class="text-left">Total</td>
+                                <td class="text-right">5094</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"></td>
+                                <td class="text-left">Paid</td>
+                                <td class="text-right">3000</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"></td>
+                                <td class="text-left">Due</td>
+                                <td class="text-right">2094</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="footer">
+                    <div class="footer-first">
+                        1. This is a computer generated cash receipt. <br>
+                        2. For return product you must bring these voucher or you can 
+                        provide the order number. <br>
+                        3. Warranty is given based on these cash receipt. Without these we 
+                        don't agree to provide warranty.
+                    </div>
+                    <div class="separator"></div>
+                    <div class="footer-last">
+                        Thank you for shopping!
+                    </div>  
                 </div>
             </div>
         </div>
