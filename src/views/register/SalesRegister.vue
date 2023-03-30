@@ -6,6 +6,7 @@ export default {
     data(){
         return{
             isValid: true,
+            isStore: true,
             invoiceNo:'',
             products: [],
             variants: [],
@@ -22,6 +23,7 @@ export default {
             acceptTotal: 0,
             refundTotal: 0,               
             completeButton: '<i class="fas fa-check"></i> Sales Complete',
+            // completeButton: '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...',
 
             //Customer Module Part
             customer: [],
@@ -30,8 +32,8 @@ export default {
             newCustomer: {},           
             customerNameError: '',
             customerMobileError: '',
-            //
-            printList: []
+            //Print Receipt data
+            cashReceipt: {}
             
         }
     },
@@ -158,8 +160,10 @@ export default {
         },
 
         addCustomer(){
-            this.isCustomer = true
-            this.$refs.inputCustomerRef.clearInput()   
+            if(this.selectedCustomer.customerId){
+                this.isCustomer = true
+                this.$refs.inputCustomerRef.clearInput()   
+            }            
         },
 
         storeCustomer(){
@@ -230,11 +234,12 @@ export default {
                 this.toast.error('Invalid paid total!')
             }
             else{
+                this.cashReceipt = {}
                 const params = {
                     'stock': this.salesList,
                     'customer_id': this.selectedCustomer.customerId,
                     'subtotal': this.subtotal,
-                    'discount': this.discount,
+                    'discount': parseFloat(this.discount),
                     'total': this.grandTotal,
                     'payment_total': parseFloat(this.paymentTotal),
                     'due': this.paymentDue
@@ -242,7 +247,11 @@ export default {
                 this.axios.post('sales',  params)
                     .then(({data}) => {
                         this.toast.success('Sales has been created successfully.')
+                        this.prepareDataBeforePrint(data.data)
                         this.onRefresh()
+                        setTimeout(() => {
+                            this.generatePrintPreview()
+                        }, 2500)
                     })
                     .catch(({response}) => {})
             }            
@@ -251,21 +260,37 @@ export default {
         getReceiptByInvoiceNo(){
             if(this.invoiceNo){
                 this.isValid = false
+                this.isStore = false
+                this.cashReceipt = {}
                 const params = 'INV-'+this.invoiceNo
                 this.axios.get('common/sales/'+ params)
                     .then(({data}) => {
                         const payload = data.data
-                        payload.sales_details.forEach((obj) => {
+                        if(payload){
+                            this.prepareDataBeforePrint(payload)
+                            //Sales Details
+                            payload.sales_details.forEach((obj) => {
                             const list = {
                                 'stockId': obj.stock.id,
                                 'productName': obj.stock.product_variant.product.product_name,
                                 'variantName': obj.stock.product_variant.variant.variant_name,
                                 'price': Math.ceil(obj.stock.price),
                                 'quantity': obj.quantity,
-                                'total': Math.ceil(obj.stock.price)    
+                                'total': Math.ceil(obj.stock.price * obj.quantity)    
                             }
                             this.salesList.push(list)
+                            //Customer
+                            this.onSelectedCustomer(payload.customer)
+                            this.isCustomer = true
+                            //Amount
+                            this.discount = Math.ceil(payload.discount)
+                            this.grandTotal = Math.ceil(payload.total)
+                            this.paymentTotal = Math.ceil(payload.payment_total)
+                            this.paymentDue = Math.ceil(payload.due)
                         })
+                        }else{
+                            this.toast.error('Invoice not found!') 
+                        }                        
                     })
                     .catch(({response}) => {})
             }else{
@@ -284,6 +309,7 @@ export default {
 
         onRefresh(){
             this.isValid = true
+            this.isStore = true
             this.invoiceNo = ''
             this.products = []
             this.variants = []            
@@ -307,9 +333,39 @@ export default {
             this.customerMobileError = ''
         },
 
+        prepareDataBeforePrint(data){
+            let products = []
+            data.sales_details.forEach((obj) => {
+                const list = {
+                    'stockId': obj.stock.id,
+                    'productName': obj.stock.product_variant.product.product_name,
+                    'variantName': obj.stock.product_variant.variant.variant_name,
+                    'price': Math.ceil(obj.stock.price),
+                    'quantity': obj.quantity,
+                    'total': Math.ceil(obj.stock.price * obj.quantity)
+                }
+                products.push(list)
+            })
+            Object.assign(this.cashReceipt, {products: products})
+            this.cashReceipt.invoiceNo = data.invoice_no
+            this.cashReceipt.subtotal = Math.ceil(data.subtotal)
+            this.cashReceipt.discount = Math.ceil(data.discount)
+            this.cashReceipt.total = Math.ceil(data.total)
+            this.cashReceipt.paymentTotal = Math.ceil(data.payment_total)
+            this.cashReceipt.due = Math.ceil(data.due)
+            this.cashReceipt.createdAt = data.created_at
+            this.cashReceipt.customerName = data.customer.name,
+            this.cashReceipt.mobileNo = data.customer.mobile_no,
+            this.cashReceipt.address = data.customer.address ? data.customer.address : 'N/A'
+
+        },
+
         generatePrintPreview() {
-            let frame = this.$refs.salesPrint.contentWindow;
             const contents = this.$refs.salesPrint.innerHTML;
+            let preview = document.createElement('iframe');
+            preview.name = "Print Preview";
+            document.body.appendChild(preview);
+            let frame = preview.contentWindow ? preview.contentWindow : preview.contentDocument.document ? preview.contentDocument.document : preview.contentDocument;          
             frame.document.open();
             frame.document.write('<html lang="en"><head><title>Sales Register</title>');
             frame.document.write('<link rel="stylesheet" type="text/css" href="/css/sales.css"/>');
@@ -322,6 +378,7 @@ export default {
                 // window.frames["frame"].print();
                 frame.focus();
                 frame.print();
+                document.body.removeChild(preview);
             }, 500);
             return false;
         },
@@ -360,10 +417,11 @@ export default {
                         <div class="col-3 g-0">
                             <button class="btn btn-success btn-sm btn-flat me-1" @click="getReceiptByInvoiceNo">
                                 <i class="fas fa-search"></i> Search </button>
-                            <a class="btn btn-warning text-white btn-sm btn-flat" @click="onRefresh">
+                            <a class="btn btn-outline-warning btn-sm btn-flat" @click="onRefresh">
                                 <i class="fa fa-sync-alt"></i> Refresh </a>
                         </div>
                         <div class="col-5 d-flex justify-content-end">                               
+                            <router-link target="_blank" class="btn btn-outline-success btn-sm btn-flat me-1" :to="{name: 'register.sales'}"><i class="fas fa-redo"></i> Sales Return</router-link>
                             <router-link target="_blank" class="btn btn-secondary btn-sm btn-flat me-1" :to="{name: 'register.sales'}"><i class="fas fa-hand-back-fist"></i> Hold</router-link>
                         </div>
                     </div>
@@ -382,20 +440,21 @@ export default {
                                 @selectItem="onSelectedItem"    
                                 @onInput="onInput" 
                                 autofocus   
+                                :disabled="!isStore" 
                                 tabindex="0"                                   
                             ></typeahead>
                         </div>
                         <div class="col-3">
-                            <select id="variant" class="form-select form-select-sm" v-model="productVariantId" tabindex="0">
+                            <select id="variant" class="form-select form-select-sm" v-model="productVariantId" tabindex="0" :disabled="!isStore" >
                                 <option value="">-- Select Variant --</option>
                                 <option v-for="item in variants" :key="item.id" :value="item.product_variant_id" >{{ item.variant_name }}</option>
                             </select>
                         </div>
                         <div class="col">
-                            <a href="javascript:void(0)" class="btn btn-primary btn-sm" @click="addProductToInvoice" tabindex="0">
-                                <i class="fas fa-plus-circle"></i> Add Product</a>
-                            <a class="btn btn-danger btn-sm ms-1" tabindex="-1" @click="onClear">
-                                <i class="fa fa-sync-alt"></i> Clear </a>
+                            <button class="btn btn-primary btn-flat btn-sm" @click="addProductToInvoice" tabindex="0" :disabled="!isStore">
+                                <i class="fas fa-plus-circle"></i> Add Product</button>
+                            <button class="btn btn-outline-danger btn-sm btn-flat ms-1" tabindex="-1" @click="onClear" :disabled="!isStore">
+                                <i class="fa fa-sync-alt"></i> Clear </button>
                         </div>
                     </div>
                 </div>
@@ -426,6 +485,7 @@ export default {
                                         style="width:70px" 
                                         min="1"
                                         tabindex="-1"
+                                        :disabled="!isStore"
                                         @input="changeQuantity(item.stockId, item.quantity) 
                                                                                
                                     ">
@@ -433,7 +493,7 @@ export default {
                                 <td class="text-center">{{ item.price }}/-</td>
                                 <td class="text-center">{{ item.total }}/-</td>
                                 <td class="text-center">
-                                    <button class="bg-danger text-white" style="border: none" @click="removeItem(item.stockId)" tabindex="-1"><i class="fas fa-trash"></i></button>
+                                    <button class="bg-danger text-white" style="border: none" @click="removeItem(item.stockId)" tabindex="-1" :disabled="!isStore"><i class="fas fa-trash"></i></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -456,17 +516,18 @@ export default {
                                 @selectItem="onSelectedCustomer"    
                                 @onInput="onCustomerInput" 
                                 autofocus   
-                                tabindex="0"                                   
+                                tabindex="0"
+                                :disabled="!isStore"                                 
                             ></typeahead>
                         </div>
                         <div class="col-4">
-                            <a id="searchCustomerButton" href="javascript:void(0)" class="btn btn-primary btn-block btn-sm" @click="addCustomer"><i class="fas fa-plus-circle"></i> Add Customer </a>
+                            <button id="searchCustomerButton" href="javascript:void(0)" class="btn btn-primary btn-block btn-sm btn-flat" @click="addCustomer" :disabled="!isStore"><i class="fas fa-plus-circle"></i> Add Customer </button>
                         </div>
                     </div>
                     <h6 class="text-center mt-1"><strong>OR</strong></h6>
                     <div class="d-flex align-items-center">
-                        <button  class="btn btn-success btn-sm text-white" style="width: 50%; margin-right: 10px" data-bs-target="#customerModal" data-bs-toggle="modal" @click="clearCustomer"><i class="fas fa-plus"></i> New Customer</button>
-                        <a class="btn btn-danger btn-sm" style="width: 50%" @click="clearCustomer"><i class="far fa-times-circle"></i> Remove</a>
+                        <button  class="btn btn-success btn-sm btn-flat text-white" style="width: 50%; margin-right: 10px" data-bs-target="#customerModal" data-bs-toggle="modal" @click="clearCustomer" :disabled="!isStore" ><i class="fas fa-plus"></i> Customer Entry</button>
+                        <button class="btn btn-outline-danger btn-sm btn-flat" style="width: 50%" @click="clearCustomer" :disabled="!isStore" ><i class="fas fa-times-circle"></i> Erase Customer</button>
                     </div>
                     <div class="customer-info" v-if="isCustomer">
                         <p><strong>Name: </strong><span>{{ selectedCustomer.name }}</span></p>
@@ -487,6 +548,7 @@ export default {
                                     readonly 
                                     v-model="subtotal" 
                                     @focus="$event.target.select()"
+                                    
                                 >
                             </th> 
                             <th><h5>/=</h5></th>                           
@@ -499,6 +561,7 @@ export default {
                                     v-model="discount" 
                                     @input="calculateTotalAfterDiscount" 
                                     @focus="$event.target.select()"
+                                    :disabled="!isStore" 
                                 >
                             </th>
                             <th><h5>%</h5></th>                            
@@ -523,6 +586,7 @@ export default {
                                     v-model="paymentTotal"
                                     @focus="$event.target.select()" 
                                     @keyup="calculateDue"
+                                    :disabled="!isStore" 
                                 >
                             </th>
                             <th><h5>/=</h5></th>                            
@@ -548,6 +612,7 @@ export default {
                                     v-model="acceptTotal" 
                                     @focus="$event.target.select()" 
                                     @keyup="calculateRefund"
+                                    :disabled="!isStore" 
                                     >
                                 </th>
                             <th><h5>/=</h5></th>                            
@@ -625,7 +690,7 @@ export default {
 
 
     <!-- print area -->
-    <iframe ref="salesPrint" style="visibility: hidden;">          
+    <div ref="salesPrint" style="visibility: hidden;">          
         <div class="print-area">
             <div class="container">
                 <div class="pre-head">
@@ -639,8 +704,11 @@ export default {
                 </div>
                 <div class="separator"></div>
                 <div class="post-head">
-                    <h3>Invoice No: INV-000003</h3>
+                    <h3>Invoice No: {{ cashReceipt.invoiceNo }}</h3>
                     <h3>Date: 13/03/2023 10:34 PM</h3>
+                    <h3>Customer Name: {{ cashReceipt.customerName }}</h3>
+                    <h3>Mobile: {{ cashReceipt.mobileNo }}</h3>
+                    <h3>Address: {{ cashReceipt.address }}</h3>
                     <h3>Sold By: Ador Rahman</h3>
                 </div>
                 <div class="list">
@@ -650,20 +718,17 @@ export default {
                             <th width="60%">PRODUCT</th>
                             <th>QTY</th>
                             <th class="text-right">PRICE</th>
+                            <th class="text-right">TOTAL</th>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="text-center" width="10%">1</td>
-                                <td>VISION Motor Body River Wind2 18"Stand Fan 5Blade</td>
-                                <td class="text-center">1</td>
-                                <td class="text-right">2500</td>
+                            <tr v-for="(product, index) in cashReceipt.products" :key="index">
+                                <td class="text-center" width="10%">{{ index + 1 }}</td>
+                                <td>{{ product.productName }} {{ product.varaintName }}</td>
+                                <td class="text-center">{{ product.quantity }}</td>
+                                <td class="text-right">{{ product.price }}</td>
+                                <td class="text-right">{{ product.total }}</td>
                             </tr>
-                            <tr>
-                                <td class="text-center" width="10%">2</td>
-                                <td>VISION Smart Saver Ceiling Fan 56" (Ivory)</td>
-                                <td class="text-center">1</td>
-                                <td class="text-right">3160</td>
-                            </tr>
+                           
                         </tbody>
                     </table>
                     <table class="list-table">
@@ -671,27 +736,27 @@ export default {
                             <tr>
                                 <td colspan="2" width="60%"></td>
                                 <td class="text-left">SubTotal</td>
-                                <td class="text-right">5660</td>
+                                <td class="text-right">{{ cashReceipt.subtotal }}</td>
                             </tr>
                             <tr>
                                 <td colspan="2"></td>
                                 <td class="text-left">Discount(%)</td>
-                                <td class="text-right">10</td>
+                                <td class="text-right">{{ cashReceipt.discount }}</td>
                             </tr>
                             <tr>
                                 <td colspan="2"></td>
                                 <td class="text-left">Total</td>
-                                <td class="text-right">5094</td>
+                                <td class="text-right">{{ cashReceipt.total }}</td>
                             </tr>
                             <tr>
                                 <td colspan="2"></td>
                                 <td class="text-left">Paid</td>
-                                <td class="text-right">3000</td>
+                                <td class="text-right">{{ cashReceipt.paymentTotal }}</td>
                             </tr>
                             <tr>
                                 <td colspan="2"></td>
                                 <td class="text-left">Due</td>
-                                <td class="text-right">2094</td>
+                                <td class="text-right">{{ cashReceipt.due }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -711,7 +776,7 @@ export default {
                 </div>
             </div>
         </div>
-    </iframe>   
+    </div>   
 
 </div>
 </template>
