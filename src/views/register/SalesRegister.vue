@@ -270,15 +270,16 @@ export default {
                             this.prepareDataBeforePrint(payload)
                             //Sales Details
                             payload.sales_details.forEach((obj) => {
-                            const list = {
-                                'stockId': obj.stock.id,
-                                'productName': obj.stock.product_variant.product.product_name,
-                                'variantName': obj.stock.product_variant.variant.variant_name,
-                                'price': Math.ceil(obj.stock.price),
-                                'quantity': obj.quantity,
-                                'total': Math.ceil(obj.stock.price * obj.quantity)    
-                            }
-                            this.salesList.push(list)
+                                const list = {
+                                    'stockId': obj.stock.id,
+                                    'productName': obj.stock.product_variant.product.product_name,
+                                    'variantName': obj.stock.product_variant.variant.variant_name,
+                                    'price': Math.ceil(obj.stock.price),
+                                    'quantity': obj.quantity,
+                                    'total': Math.ceil(obj.stock.price * obj.quantity)    
+                                }
+                                this.salesList.push(list)
+                            })
                             //Customer
                             this.onSelectedCustomer(payload.customer)
                             this.isCustomer = true
@@ -287,7 +288,6 @@ export default {
                             this.grandTotal = Math.ceil(payload.total)
                             this.paymentTotal = Math.ceil(payload.payment_total)
                             this.paymentDue = Math.ceil(payload.due)
-                        })
                         }else{
                             this.toast.error('Invoice not found!') 
                         }                        
@@ -361,7 +361,7 @@ export default {
         },
 
         generatePrintPreview() {
-            const contents = this.$refs.salesPrint.innerHTML;
+            const contents = this.$refs.salesPrintPOS.innerHTML;
             let preview = document.createElement('iframe');
             preview.name = "Print Preview";
             document.body.appendChild(preview);
@@ -383,7 +383,7 @@ export default {
             return false;
         },
 
-        rePrintReceipt(){
+        printReceiptPOS(){
             this.generatePrintPreview()
         }
     },
@@ -415,13 +415,13 @@ export default {
                             </div>
                         </div>
                         <div class="col-3 g-0">
-                            <button class="btn btn-success btn-sm btn-flat me-1" @click="getReceiptByInvoiceNo">
+                            <button class="btn btn-success btn-sm btn-flat me-1" @click="getReceiptByInvoiceNo" :disabled="!isStore">
                                 <i class="fas fa-search"></i> Search </button>
                             <a class="btn btn-outline-warning btn-sm btn-flat" @click="onRefresh">
                                 <i class="fa fa-sync-alt"></i> Refresh </a>
                         </div>
                         <div class="col-5 d-flex justify-content-end">                               
-                            <router-link target="_blank" class="btn btn-outline-success btn-sm btn-flat me-1" :to="{name: 'register.sales'}"><i class="fas fa-redo"></i> Sales Return</router-link>
+                            <router-link class="btn btn-outline-success btn-sm btn-flat me-1" :to="{name: 'register.sales.return'}"><i class="fas fa-redo"></i> Sales Return</router-link>
                             <router-link target="_blank" class="btn btn-secondary btn-sm btn-flat me-1" :to="{name: 'register.sales'}"><i class="fas fa-hand-back-fist"></i> Hold</router-link>
                         </div>
                     </div>
@@ -453,7 +453,7 @@ export default {
                         <div class="col">
                             <button class="btn btn-primary btn-flat btn-sm" @click="addProductToInvoice" tabindex="0" :disabled="!isStore">
                                 <i class="fas fa-plus-circle"></i> Add Product</button>
-                            <button class="btn btn-outline-danger btn-sm btn-flat ms-1" tabindex="-1" @click="onClear" :disabled="!isStore">
+                            <button class="btn btn-outline-danger btn-sm btn-flat ms-1 px-3" tabindex="-1" @click="onClear" :disabled="!isStore">
                                 <i class="fa fa-sync-alt"></i> Clear </button>
                         </div>
                     </div>
@@ -629,18 +629,23 @@ export default {
             <div class="card bg-light">
                 <div class="card-body pad-6">
                     <div class="row">
-                        <div class="col-12 d-grid mb-2"> 
+                        <div class="col-12 d-grid mb-1"> 
                             <button class="btn btn-success btn-flat" :disabled="!isValid"  v-html="completeButton" @click="storeSales"></button>  
                         </div>                         
                     </div>  
-                    <div class="row">
+                    <div class="row g-1">
                         <div class="col-6 d-grid"> 
-                            <button class="btn btn-primary btn-flat" @click="onRefresh"><i class="fas fa-refresh"></i> Refresh</button>  
+                            <button class="btn btn-primary btn-flat" @click="printReceipt" :disabled="isStore"><i class="fas fa-file-invoice"></i> Print Voucher</button>  
                         </div> 
-                        <div class="col-6 d-grid"> 
-                            <button class="btn btn-secondary btn-flat" @click="rePrintReceipt"> <i class="fas fa-print"></i> Re Print</button>  
+                        <div class="col-6 d-grid "> 
+                            <button class="btn btn-secondary btn-flat" @click="printReceiptPOS" :disabled="isStore"> <i class="fas fa-receipt"></i> Print POS</button>  
                         </div>
-                    </div>   
+                    </div>  
+                    <div class="row">
+                        <div class="col-12 d-grid mt-1"> 
+                            <button class="btn btn-outline-info btn-flat" @click="onRefresh"><i class="fas fa-refresh"></i> Refresh</button>  
+                        </div>                         
+                    </div> 
                 </div>
             </div>
                       
@@ -690,7 +695,7 @@ export default {
 
 
     <!-- print area -->
-    <div ref="salesPrint" style="visibility: hidden;">          
+    <div ref="salesPrintPOS" style="visibility: hidden;">          
         <div class="print-area">
             <div class="container">
                 <div class="pre-head">

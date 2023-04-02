@@ -9,6 +9,7 @@ import ProductEdit from '../views/product/ProductEdit.vue'
 import Stock from '../views/stock/Stock.vue'
 import StockAdd from '../views/stock/StockAdd.vue'
 import SalesRegister from '../views/register/SalesRegister.vue'
+import SalesReturn from '../views/register/SalesReturn.vue'
 import PurchaseRegister from '../views/register/PurchaseRegister.vue'
 import Customer from '../views/customer/Customer.vue'
 import Supplier from '../views/supplier/Supplier.vue'
@@ -26,6 +27,7 @@ const routes = [
   { path: "/stock", name: "stock.view", component: Stock },
   { path: "/stock/add", name: "stock.add", component: StockAdd },
   { path: "/register/sales", name: "register.sales", component: SalesRegister },
+  { path: "/register/sales/return", name: "register.sales.return", component: SalesReturn },
   { path: "/register/purchase", name: "register.purchase", component: PurchaseRegister },
   { path: "/customer", name: "customer.view", component: Customer },
   { path: "/supplier", name: "supplier.view", component: Supplier },

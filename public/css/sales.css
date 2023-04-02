@@ -77,7 +77,6 @@ h1, h2, h3, h4, h5, h6, p {
 .list{
     padding: 10px 0;
 }
-
 .list-table{
     border-collapse: collapse;
     width: 100%;
@@ -95,6 +94,7 @@ h1, h2, h3, h4, h5, h6, p {
 .list-table tr:last-child{   
     border-bottom: 1px dashed #868686;
 }
+
 
 .footer{
     display: flex;
